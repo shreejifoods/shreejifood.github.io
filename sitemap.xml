@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Main Page -->
+  <url>
+    <loc>https://shreejifood.github.io/</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/photo-1519162808019-7de1683fa-h_m298gq7r.jpg</image:loc>
+      <image:title>Shreeji Food & Snacks | Sriji Food | Shriji Food | Sreeji Food - Homemade Vegetarian Indian Food</image:title>
+      <image:caption>Shreeji Food & Snacks (Sriji Food, Shriji Food, Sreeji Food) - Premium homemade vegetarian and vegan Indian meals delivered daily in Hatfield</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/paneer.jpg</image:loc>
+      <image:title>Homemade Vegetarian Paneer Curry</image:title>
+      <image:caption>Fresh Indian cottage cheese curry - authentic homemade vegetarian dish</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/noodles.jpg</image:loc>
+      <image:title>Vegetarian Indo-Chinese Noodles</image:title>
+      <image:caption>Homemade Indian Chinese fusion noodles - vegetarian comfort food</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/vadapav.jpg</image:loc>
+      <image:title>Authentic Vegetarian Vada Pav</image:title>
+      <image:caption>Mumbai street food snack - vegetarian potato fritter sandwich</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/pavbhaji.jpg</image:loc>
+      <image:title>Homemade Vegetarian Pav Bhaji</image:title>
+      <image:caption>Spicy mixed vegetable curry with bread - popular Indian vegetarian dish</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/manchurian.jpg</image:loc>
+      <image:title>Vegetarian Manchurian Balls</image:title>
+      <image:caption>Indo-Chinese fusion appetizer - vegetarian vegetable balls in tangy sauce</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/pulav.jpg</image:loc>
+      <image:title>Homemade Vegetarian Pulao Rice</image:title>
+      <image:caption>Fragrant Indian rice dish with vegetables and aromatic spices</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/thepla.jpg</image:title>
+      <image:title>Fresh Gujarati Thepla</image:title>
+      <image:caption>Traditional Indian flatbread with fenugreek leaves - healthy vegetarian option</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/assets/images/rice.jpg</image:loc>
+      <image:title>Steamed Basmati Rice</image:title>
+      <image:caption>Perfect accompaniment for vegetarian curries - long grain aromatic rice</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/menu.png</image:loc>
+      <image:title>Weekly Vegetarian Menu</image:title>
+      <image:caption>Homemade Indian food specials - Gujarati Punjabi Indo-Chinese dishes</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://shreejifood.github.io/item_list.jpg</image:loc>
+      <image:title>Vegetarian Party Catering Menu</image:title>
+      <image:caption>Bulk orders for events - Indian snacks sweets curries</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Menu Section -->
+  <url>
+    <loc>https://shreejifood.github.io/#menu</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Items Section -->
+  <url>
+    <loc>https://shreejifood.github.io/#item_list</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- About Section -->
+  <url>
+    <loc>https://shreejifood.github.io/#about</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Contact Section -->
+  <url>
+    <loc>https://shreejifood.github.io/#contact</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Inquiry Section -->
+  <url>
+    <loc>https://shreejifood.github.io/#appointment</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Hygiene Section -->
+  <url>
+    <loc>https://shreejifood.github.io/#ratings</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+</urlset>
