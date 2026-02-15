@@ -1,0 +1,842 @@
+/* Main custom styles */
+/* Fix navbar positioning and spacing */
+.navbar-fixed-top {
+    top: auto;
+    z-index: 1030;
+    position: fixed !important;
+    width: 100%;
+}
+
+/* Add proper spacing for fixed navbar */
+body {
+    padding-top: 0 !important;
+    /* Remove excessive padding */
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* Hero section adjustments */
+.header16.mbr-fullscreen {
+    min-height: 100vh;
+    height: 100vh;
+    /* Force exact viewport height */
+    padding-top: 100px !important;
+    /* Account for fixed navbar */
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    /* Prevent content from showing below */
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Content positioning in hero */
+.header16 .container-fluid {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+    background: transparent;
+    /* No background - text directly on image */
+    margin: 1rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    body {
+        padding-top: 0 !important;
+        /* Remove body padding */
+    }
+
+    .header16.mbr-fullscreen {
+        padding-top: 90px !important;
+        min-height: 100vh;
+        height: 100vh;
+        /* Force exact viewport height on mobile */
+    }
+
+    .header16 .container-fluid {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        background: transparent;
+        /* No background on mobile */
+        margin: 0.5rem;
+    }
+
+    /* Adjust text sizes for mobile */
+    .header16 h1 {
+        font-size: 1.8rem !important;
+        /* Reduced font size */
+        line-height: 1.3;
+        /* Better line spacing */
+        margin-bottom: 1.2rem !important;
+        /* Reduced space between elements */
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.7);
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+
+    .header16 p {
+        font-size: 0.95rem !important;
+        /* Reduced font size */
+        line-height: 1.5;
+        /* Better line spacing */
+        margin-bottom: 1rem !important;
+        /* Reduced space between paragraphs */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.6);
+        color: #ffffff !important;
+        font-weight: 500 !important;
+    }
+
+    /* Better button spacing on mobile */
+    .header16 .mbr-section-btn {
+        margin-top: 1.5rem;
+    }
+
+    /* Fix navbar on mobile */
+    .navbar-fixed-top {
+        padding: 0.5rem 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        padding-top: 0 !important;
+    }
+
+    .header16.mbr-fullscreen {
+        padding-top: 80px !important;
+        min-height: 100vh;
+        height: 100vh;
+        /* Force exact viewport height on small mobile */
+    }
+
+    .header16 .container-fluid {
+        background: transparent;
+        /* No background on small screens */
+        margin: 0.25rem;
+    }
+
+    .header16 h1 {
+        font-size: 1.5rem !important;
+        /* Reduced font size */
+        margin-bottom: 1rem !important;
+        /* Reduced space */
+        line-height: 1.3;
+        /* Better line spacing */
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 1), 1px 1px 2px rgba(0, 0, 0, 0.8);
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+
+    .header16 p {
+        font-size: 0.9rem !important;
+        /* Reduced font size */
+        margin-bottom: 0.9rem !important;
+        /* Reduced space */
+        line-height: 1.5;
+        /* Better line spacing */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 1), 1px 1px 2px rgba(0, 0, 0, 0.7);
+        color: #ffffff !important;
+        font-weight: 500 !important;
+    }
+
+    /* Improve touch targets on mobile */
+    .btn {
+        min-height: 44px;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Better spacing for mobile content */
+    .header16 .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    /* Improve navbar brand on small screens */
+    .navbar-brand img {
+        height: 3rem !important;
+    }
+
+    .navbar-caption {
+        font-size: 0.8rem !important;
+    }
+
+    /* Fix navbar on small screens */
+    .navbar-fixed-top {
+        padding: 0.25rem 0.75rem;
+    }
+}
+
+/* Additional mobile improvements */
+@media (max-width: 480px) {
+    body {
+        padding-top: 0 !important;
+    }
+
+    .header16.mbr-fullscreen {
+        padding-top: 70px !important;
+        min-height: 100vh;
+        height: 100vh;
+        /* Force exact viewport height on very small screens */
+    }
+
+    .header16 .container-fluid {
+        background: transparent;
+        /* No background for very small screens */
+        margin: 0.1rem;
+    }
+
+    .header16 h1 {
+        font-size: 1.4rem !important;
+        /* Reduced font size */
+        margin-bottom: 0.9rem !important;
+        /* Reduced space */
+        line-height: 1.3;
+        /* Better line spacing */
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 1), 1px 1px 2px rgba(0, 0, 0, 0.9);
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+
+    .header16 p {
+        font-size: 0.85rem !important;
+        /* Reduced font size */
+        margin-bottom: 0.8rem !important;
+        /* Reduced space */
+        line-height: 1.5;
+        /* Better line spacing */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 1), 1px 1px 2px rgba(0, 0, 0, 0.8);
+        color: #ffffff !important;
+        font-weight: 500 !important;
+    }
+
+    /* Stack buttons vertically on very small screens */
+    .navbar-buttons .btn {
+        display: block;
+        width: 100%;
+        margin: 0.25rem 0;
+        font-size: 0.85rem;
+    }
+
+    /* Improve text readability */
+    .header16 .mbr-text {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Fix navbar on very small screens */
+    .navbar-fixed-top {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .header16 .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+#shreejifoodBanner.container-banner {
+    height: 8rem;
+    opacity: 1;
+    -webkit-animation: 4s linear animationHeight;
+    -moz-animation: 4s linear animationHeight;
+    -o-animation: 4s linear animationHeight;
+    animation: 4s linear animationHeight;
+    transition: all 0.5s;
+}
+
+#shreejifoodBanner.container-banner.container-banner-closing {
+    pointer-events: none;
+    height: 0;
+    opacity: 0;
+    -webkit-animation: 0.5s linear animationClosing;
+    -moz-animation: 0.5s linear animationClosing;
+    -o-animation: 0.5s linear animationClosing;
+    animation: 0.5s linear animationClosing;
+}
+
+#shreejifoodBanner .banner {
+    min-height: 8rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 10px;
+    opacity: 1;
+    -webkit-animation: 4s linear animationBanner;
+    -moz-animation: 4s linear animationBanner;
+    -o-animation: 4s linear animationBanner;
+    animation: 4s linear animationBanner;
+    z-index: 1031;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#shreejifoodBanner .banner p {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    animation: none;
+    visibility: visible;
+}
+
+#shreejifoodBanner .buy-license {
+    text-decoration: underline;
+}
+
+#shreejifoodBanner .banner .btn {
+    margin: 0.3rem 0.5rem;
+    animation: none;
+    visibility: visible;
+}
+
+.navbar.opened {
+    z-index: 1032;
+}
+
+/* Improve navbar responsiveness */
+.navbar-nav .nav-link {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.navbar-brand {
+    flex-shrink: 0;
+}
+
+.navbar-caption-wrap {
+    margin-left: 0.5rem;
+}
+
+/* Mobile navbar improvements */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background: rgba(255, 255, 255, 0.95);
+        margin-top: 0.5rem;
+        border-radius: 0.25rem;
+        padding: 1rem;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-nav .nav-link:last-child {
+        border-bottom: none;
+    }
+
+    .navbar-buttons {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .navbar-buttons .btn {
+        margin: 0.25rem;
+        display: inline-block;
+    }
+}
+
+/* Ensure proper spacing for all sections */
+section {
+    position: relative;
+    z-index: 1;
+}
+
+/* Prevent white space at bottom of hero */
+.header16.mbr-fullscreen::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: transparent;
+    z-index: 1;
+}
+
+/* Fix any potential overlap issues */
+.container-fluid {
+    position: relative;
+    z-index: 2;
+}
+
+/* Additional fixes for common issues */
+* {
+    box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll */
+html,
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Fix image responsiveness */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Improve button hover states */
+.btn:hover {
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+/* Hero section button styling */
+.header16 .btn {
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-weight: bold !important;
+    backdrop-filter: blur(3px);
+}
+
+.header16 .btn:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Fix navbar brand alignment */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+/* Ensure proper text contrast */
+.mbr-white {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Desktop hero text styling */
+.header16 h1 {
+    font-size: 2.2rem !important;
+    /* Reduced desktop font size */
+    line-height: 1.3;
+    /* Better line spacing */
+    margin-bottom: 1.5rem !important;
+    /* Reduced space between elements */
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.9), 2px 2px 4px rgba(0, 0, 0, 0.7);
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+.header16 p {
+    font-size: 1.1rem !important;
+    /* Reduced desktop font size */
+    line-height: 1.6;
+    /* Better line spacing */
+    margin-bottom: 1.2rem !important;
+    /* Reduced space between paragraphs */
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9), 1px 1px 3px rgba(0, 0, 0, 0.6);
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+@-webkit-keyframes animationBanner {
+    0% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    75% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    100% {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+@-moz-keyframes animationBanner {
+    0% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    75% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    100% {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+@-o-keyframes animationBanner {
+    0% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    75% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    100% {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+@keyframes animationBanner {
+    0% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    75% {
+        opacity: 0;
+        top: -8rem;
+    }
+
+    100% {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+@-webkit-keyframes animationHeight {
+    0% {
+        height: 0;
+    }
+
+    75% {
+        height: 0;
+    }
+
+    100% {
+        height: 8rem;
+    }
+}
+
+@-moz-keyframes animationHeight {
+    0% {
+        height: 0;
+    }
+
+    75% {
+        height: 0;
+    }
+
+    100% {
+        height: 8rem;
+    }
+}
+
+@-o-keyframes animationHeight {
+    0% {
+        height: 0;
+    }
+
+    75% {
+        height: 0;
+    }
+
+    100% {
+        height: 8rem;
+    }
+}
+
+@keyframes animationHeight {
+    0% {
+        height: 0;
+    }
+
+    75% {
+        height: 0;
+    }
+
+    100% {
+        height: 8rem;
+    }
+}
+
+@-webkit-keyframes animationClosing {
+    0% {
+        height: 8rem;
+        opacity: 1;
+    }
+
+    30% {
+        height: 8rem;
+        opacity: 0.5;
+    }
+
+    100% {
+        height: 0;
+        opacity: 0;
+    }
+}
+
+@-moz-keyframes animationClosing {
+    0% {
+        height: 8rem;
+        opacity: 1;
+    }
+
+    30% {
+        height: 8rem;
+        opacity: 0.5;
+    }
+
+    100% {
+        height: 0;
+        opacity: 0;
+    }
+}
+
+@-o-keyframes animationClosing {
+    0% {
+        height: 8rem;
+        opacity: 1;
+    }
+
+    30% {
+        height: 8rem;
+        opacity: 0.5;
+    }
+
+    100% {
+        height: 0;
+        opacity: 0;
+    }
+}
+
+@keyframes animationClosing {
+    0% {
+        height: 8rem;
+        opacity: 1;
+    }
+
+    30% {
+        height: 8rem;
+        opacity: 0.5;
+    }
+
+    100% {
+        height: 0;
+        opacity: 0;
+    }
+}
+
+@media(max-width: 767px) {
+    #shreejifoodBanner.container-banner {
+        height: 12rem;
+    }
+
+    #shreejifoodBanner .banner {
+        min-height: 12rem;
+    }
+
+    @-webkit-keyframes animationBanner {
+        0% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        75% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        100% {
+            opacity: 1;
+            top: 0;
+        }
+    }
+
+    @-moz-keyframes animationBanner {
+        0% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        75% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        100% {
+            opacity: 1;
+            top: 0;
+        }
+    }
+
+    @-o-keyframes animationBanner {
+        0% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        75% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        100% {
+            opacity: 1;
+            top: 0;
+        }
+    }
+
+    @keyframes animationBanner {
+        0% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        75% {
+            opacity: 0;
+            top: -12rem;
+        }
+
+        100% {
+            opacity: 1;
+            top: 0;
+        }
+    }
+
+    @-webkit-keyframes animationHeight {
+        0% {
+            height: 0;
+        }
+
+        75% {
+            height: 0;
+        }
+
+        100% {
+            height: 12rem;
+        }
+    }
+
+    @-moz-keyframes animationHeight {
+        0% {
+            height: 0;
+        }
+
+        75% {
+            height: 0;
+        }
+
+        100% {
+            height: 12rem;
+        }
+    }
+
+    @-o-keyframes animationHeight {
+        0% {
+            height: 0;
+        }
+
+        75% {
+            height: 0;
+        }
+
+        100% {
+            height: 12rem;
+        }
+    }
+
+    @keyframes animationHeight {
+        0% {
+            height: 0;
+        }
+
+        75% {
+            height: 0;
+        }
+
+        100% {
+            height: 12rem;
+        }
+    }
+
+    @-webkit-keyframes animationClosing {
+        0% {
+            height: 12rem;
+            opacity: 1;
+        }
+
+        30% {
+            height: 12rem;
+            opacity: 0.5;
+        }
+
+        100% {
+            height: 0;
+            opacity: 0;
+        }
+    }
+
+    @-moz-keyframes animationClosing {
+        0% {
+            height: 12rem;
+            opacity: 1;
+        }
+
+        30% {
+            height: 12rem;
+            opacity: 0.5;
+        }
+
+        100% {
+            height: 0;
+            opacity: 0;
+        }
+    }
+
+    @-o-keyframes animationClosing {
+        0% {
+            height: 12rem;
+            opacity: 1;
+        }
+
+        30% {
+            height: 12rem;
+            opacity: 0.5;
+        }
+
+        100% {
+            height: 0;
+            opacity: 0;
+        }
+    }
+
+    @keyframes animationClosing {
+        0% {
+            height: 12rem;
+            opacity: 1;
+        }
+
+        30% {
+            height: 12rem;
+            opacity: 0.5;
+        }
+
+        100% {
+            height: 0;
+            opacity: 0;
+        }
+    }
+}
