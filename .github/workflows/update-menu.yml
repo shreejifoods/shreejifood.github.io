@@ -1,0 +1,46 @@
+name: Update Menu from Image
+
+on:
+  push:
+    paths:
+      - 'menu.png'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  parse-menu:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Copy menu.png to assets
+        run: |
+          cp menu.png assets/images/menu.png
+
+      - name: Parse menu image and generate JSON
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MENU_IMAGE_PATH: menu.png
+          OUTPUT_JSON_PATH: assets/data/menu.json
+        run: |
+          python scripts/parse-menu-image.py
+
+      - name: Show generated menu.json
+        run: cat assets/data/menu.json
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/data/menu.json assets/images/menu.png
+          git diff --cached --quiet || git commit -m "🍛 Auto-update menu from menu.png"
+          git push

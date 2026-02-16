@@ -1,0 +1,121 @@
+{
+    "currency": "£",
+    "menu": {
+        "Monday": {
+            "items": [
+                {
+                    "id": "mon_set",
+                    "name": "Monday Meal Set",
+                    "price": 9.00,
+                    "description": "Gavar & Bataka Sabji, Chapatis (x4), Rice, Gujarati Dal",
+                    "image": "assets/images/menu.png"
+                }
+            ],
+            "active": true
+        },
+        "Tuesday": {
+            "items": [
+                {
+                    "id": "tue_set",
+                    "name": "Tuesday Meal Set",
+                    "price": 9.00,
+                    "description": "Cabbage & Onion Sabji, Chapatis (x4), Rice, Palak Dal",
+                    "image": "assets/images/menu.png"
+                }
+            ],
+            "active": true
+        },
+        "Wednesday": {
+            "items": [
+                {
+                    "id": "wed_set",
+                    "name": "Wednesday Meal Set",
+                    "price": 9.00,
+                    "description": "Moong Curry, Chapatis (x4), Khichadi, Gujarati Kadhi",
+                    "image": "assets/images/menu.png"
+                }
+            ],
+            "active": true
+        },
+        "Thursday": {
+            "items": [
+                {
+                    "id": "thu_set",
+                    "name": "Thursday Meal Set",
+                    "price": 12.00,
+                    "description": "Paneer Lababdar Curry, Jeera & Kasuri Methi Parathas (x3), Jeera Rice & Dal Fry, Mango Delight",
+                    "image": "assets/images/menu.png"
+                }
+            ],
+            "active": true
+        },
+        "Friday": {
+            "items": [
+                {
+                    "id": "fri_set",
+                    "name": "Friday Snack",
+                    "price": 2.50,
+                    "description": "Butter VadaPau, Chutney",
+                    "image": "assets/images/menu.png"
+                }
+            ],
+            "active": true
+        }
+    },
+    "delivery_zones": [
+        {
+            "name": "Hatfield",
+            "price": 2.00,
+            "prefixes": [
+                "AL10",
+                "AL9"
+            ]
+        },
+        {
+            "name": "Welwyn Garden City",
+            "price": 3.00,
+            "prefixes": [
+                "AL8",
+                "AL7"
+            ]
+        },
+        {
+            "name": "Welham Green",
+            "price": 3.00,
+            "prefixes": [
+                "AL9"
+            ]
+        },
+        {
+            "name": "Brookmans Park",
+            "price": 3.00,
+            "prefixes": [
+                "AL9"
+            ]
+        },
+        {
+            "name": "St Albans",
+            "price": 3.50,
+            "prefixes": [
+                "AL1",
+                "AL2",
+                "AL3",
+                "AL4"
+            ]
+        },
+        {
+            "name": "Potters Bar",
+            "price": 3.50,
+            "prefixes": [
+                "EN6"
+            ]
+        },
+        {
+            "name": "London Colney",
+            "price": 3.50,
+            "prefixes": [
+                "AL2"
+            ]
+        }
+    ]
+}
