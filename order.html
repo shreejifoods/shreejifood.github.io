@@ -44,7 +44,6 @@
     <!-- Preconnect for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://js.stripe.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
     <!-- Core CSS -->
@@ -61,10 +60,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS (Loaded Last) -->
-    <link rel="stylesheet" href="assets/css/custom.css?v=2">
+    <link rel="stylesheet" href="assets/css/custom.css?v=9">
 
-    <!-- External Libs (deferred where possible) -->
-    <script src="https://js.stripe.com/v3/" defer></script>
+    <!-- External Libs -->
+    <!-- PayPal SDK: Replace YOUR_PAYPAL_CLIENT_ID with your real PayPal client ID to enable payments -->
+    <!-- <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=GBP" defer></script> -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
         defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -158,7 +158,7 @@
                                 Group</a>
                         </div>
                         <div class="navbar-buttons mbr-section-btn">
-                            <a class="btn btn-primary display-4" href="order.html">Order Online</a>
+                            <a class="btn btn-primary display-4 active-page" href="order.html">Order Online</a>
                         </div>
                     </div>
                 </div>
@@ -235,24 +235,26 @@
                                         </div>
 
                                         <!-- Delivery Details -->
-                                        <div id="delivery-details" style="display:none;" class="mb-3 p-3 rounded-3"
-                                            style="background: #f8f9fa; border: 1px dashed #dee2e6;">
-                                            <label class="form-label small fw-bold text-muted mb-1">Enter
-                                                Postcode</label>
-                                            <div class="input-group input-group-sm mb-2">
+                                        <div id="delivery-details" class="mb-3 p-3 rounded-3"
+                                            style="display:none; background: #fff8e8; border: 1px dashed #e6a800;">
+                                            <label class="form-label small fw-bold mb-1" style="color: #8a6d00;">📮
+                                                Enter Postcode</label>
+                                            <div class="input-group mb-2">
                                                 <input type="text" id="delivery-postcode" class="form-control"
                                                     placeholder="e.g. AL10 9AB"
-                                                    style="text-transform: uppercase; border-radius: 8px 0 0 8px;">
-                                                <button class="btn btn-dark" type="button" id="btn-check-postcode"
-                                                    style="border-radius: 0 8px 8px 0;">Check</button>
+                                                    style="text-transform: uppercase; border-radius: 8px 0 0 8px; padding: 10px 14px; font-size: 0.9rem; border-color: #e6a800;">
+                                                <button class="btn" type="button" id="btn-check-postcode"
+                                                    style="border-radius: 0 8px 8px 0; background: linear-gradient(135deg, #e6a800, #d49a00); color: #fff; font-weight: 600; padding: 0 22px; font-size: 0.9rem; border: 2px solid #d49a00; transition: all 0.2s ease;">✓
+                                                    Check</button>
                                             </div>
                                             <div id="postcode-feed" class="small mb-2 fw-bold"></div>
 
-                                            <label class="form-label small fw-bold text-muted mb-1">Delivery
-                                                Zone</label>
-                                            <select id="delivery-zone" class="form-select form-select-sm" disabled
-                                                style="border-radius: 8px;">
-                                                <option value="0">Enter postcode above...</option>
+                                            <label class="form-label small fw-bold mb-1" style="color: #8a6d00;">🚗
+                                                Delivery Zone <span
+                                                    style="font-weight: 400; font-size: 0.75rem; color: #b89a40;">(auto-detected)</span></label>
+                                            <select id="delivery-zone" class="form-select" disabled
+                                                style="border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; border-color: #e6a800; background-color: #fffdf5; cursor: not-allowed;">
+                                                <option value="0">Will be set from postcode...</option>
                                             </select>
                                         </div>
 
@@ -269,6 +271,12 @@
                                                 <span>Delivery</span>
                                                 <span id="cart-delivery" class="fw-semibold"
                                                     style="color: #555;">£0.00</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-1" id="row-service-fee"
+                                                style="font-size: 0.8rem; color: #999;">
+                                                <span>Service fee <small>(3%)</small></span>
+                                                <span id="cart-service-fee" class="fw-semibold"
+                                                    style="color: #999;">£0.00</span>
                                             </div>
                                             <div class="d-flex justify-content-between pt-2 mt-1"
                                                 style="border-top: 2px solid #333;">
@@ -290,29 +298,39 @@
                                         <h6 class="mb-3 fw-bold">Checkout Details</h6>
                                         <form id="checkout-form">
                                             <div class="row g-2">
-                                                <div class="col-12 mb-2"><input type="text"
-                                                        class="form-control form-control-sm" id="cust-name"
-                                                        placeholder="Full Name" required></div>
-                                                <div class="col-12 mb-2"><input type="tel"
-                                                        class="form-control form-control-sm" id="cust-phone"
-                                                        placeholder="Phone" required></div>
-                                                <div class="col-12 mb-2"><input type="email"
-                                                        class="form-control form-control-sm" id="cust-email"
-                                                        placeholder="Email" required></div>
-                                                <div class="col-12 mb-2"><textarea class="form-control form-control-sm"
-                                                        id="cust-address" rows="2"
-                                                        placeholder="Address (Required for Delivery)"></textarea></div>
-                                            </div>
-                                            <div class="mb-3 border rounded p-2 bg-light">
-                                                <label class="form-label small fw-bold mb-1">Card Payment</label>
-                                                <div id="card-element"
-                                                    class="form-control form-control-sm p-2 bg-white">
+                                                <div class="col-12 mb-2">
+                                                    <input type="text" class="form-control" id="cust-name"
+                                                        placeholder="👤  Your full name" required
+                                                        style="padding: 10px 14px; font-size: 0.9rem;">
                                                 </div>
-                                                <div id="card-errors" role="alert" class="text-danger small mt-1"></div>
+                                                <div class="col-12 mb-2">
+                                                    <input type="tel" class="form-control" id="cust-phone"
+                                                        placeholder="📞  Phone number" required
+                                                        style="padding: 10px 14px; font-size: 0.9rem;">
+                                                </div>
+                                                <div class="col-12 mb-2">
+                                                    <input type="email" class="form-control" id="cust-email"
+                                                        placeholder="✉️  Email address" required
+                                                        style="padding: 10px 14px; font-size: 0.9rem;">
+                                                </div>
+                                                <div class="col-12 mb-2 position-relative">
+                                                    <input type="text" class="form-control" id="cust-address"
+                                                        autocomplete="street-address" required
+                                                        placeholder="📍  Start typing your address..."
+                                                        style="padding: 10px 14px; font-size: 0.9rem;">
+                                                    <ul id="address-suggestions"
+                                                        class="list-group position-absolute w-100"
+                                                        style="z-index: 1060; max-height: 240px; overflow-y: auto; display: none;">
+                                                    </ul>
+                                                </div>
                                             </div>
-                                            <button type="submit" class="btn btn-success w-100 shadow-sm"
-                                                id="btn-pay">Pay &
-                                                Place Order</button>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold mb-2">Pay securely with
+                                                    PayPal</label>
+                                                <div id="paypal-button-container" class="rounded"></div>
+                                                <p class="text-muted text-center mt-2" style="font-size: 0.75rem;">You
+                                                    can pay with PayPal or credit/debit card</p>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
@@ -324,6 +342,28 @@
         </section>
     </main>
 
+    <!-- Floating Mobile Cart Bar (visible only on mobile when items in cart) -->
+    <div id="mobile-cart-bar" onclick="document.getElementById('cart-card').scrollIntoView({behavior:'smooth'})" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:1040;
+               background: linear-gradient(135deg, #e6a800, #d49a00); color:#fff;
+               padding: 12px 20px; cursor:pointer;
+               box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+               border-radius: 16px 16px 0 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; max-width:500px; margin:0 auto;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="background:rgba(255,255,255,0.25); border-radius:50%; width:32px; height:32px;
+                             display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🛒</span>
+                <span id="mobile-cart-count" class="fw-bold" style="font-size:0.95rem;">0 items</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span id="mobile-cart-total" class="fw-bold" style="font-size:1.1rem;">£0.00</span>
+                <span
+                    style="background:#fff; color:#e6a800; border-radius:8px; padding:4px 12px; font-weight:700; font-size:0.85rem;">
+                    View Cart →
+                </span>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <section class="cid-urceEae2F7 bg-dark py-4 text-center text-white">
             <div class="container">
@@ -332,7 +372,7 @@
         </section>
     </footer>
 
-    <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050"></div>
+    <div id="toast-container" class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1080"></div>
 
     <!-- Scripts -->
     <script src="assets/web/assets/jquery/jquery.min43f1.js"></script>
@@ -344,7 +384,7 @@
     <!-- App Logic -->
     <script src="assets/js/order-logic.js?v=2"></script>
     <script src="assets/js/cart-logic.js?v=2"></script>
-    <script src="assets/js/order-ui.js?v=2"></script>
+    <script src="assets/js/order-ui.js?v=8"></script>
 
     <!-- Zoom Effect -->
     <script>

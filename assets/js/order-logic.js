@@ -7,7 +7,7 @@
  * - Weekends are typically closed (handled by simply not showing them or marking closed).
  */
 
-const ORDER_CUTOFF_HOUR = 14; // 2 PM
+const ORDER_CUTOFF_HOUR = 13; // 1 PM (matches advertised "Order by 1pm")
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 /**

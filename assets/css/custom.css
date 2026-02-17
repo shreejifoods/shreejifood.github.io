@@ -1,3 +1,14 @@
+/* ========================================
+   Global Navbar Brand Consistency
+   Ensures identical header across all pages
+   ======================================== */
+.navbar-caption.display-4 {
+    font-family: 'Source Serif 4', serif !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
 /* Custom Overrides STRICTLY for Order Page */
 
 /* Apply this class to body of order.html */
@@ -15,7 +26,7 @@
 /* Scoped Card Styling */
 .order-page-specific .meal-card {
     transition: all 0.2s ease-in-out;
-    border-radius: 12px;
+    border-radius: 14px;
     border: 1px solid rgba(200, 170, 110, 0.2);
     border-left: 3px solid #e6a800;
     background: #fffaf0;
@@ -64,7 +75,7 @@
 
 .order-page-specific .meal-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(200, 160, 60, 0.15) !important;
+    box-shadow: 0 8px 24px rgba(200, 160, 60, 0.18) !important;
     border-color: rgba(230, 168, 0, 0.4);
     border-left: 3px solid #d49a00;
     background: #fff8e8;
@@ -77,14 +88,31 @@
 /* Custom Order Type Toggle (replaces Bootstrap blue) */
 .btn-order-toggle {
     color: #b8860b;
-    border: 1.5px solid #e6a800;
+    border: 2px solid #e6a800;
     background: #fff8e8;
     font-weight: 600;
     transition: all 0.2s ease;
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+
+/* Fix double border between the two buttons */
+.btn-group>.btn-order-toggle+.btn-check+.btn-order-toggle {
+    margin-left: -2px;
+}
+
+/* First button - round left corners */
+.btn-group>.btn-check:first-child+.btn-order-toggle {
+    border-radius: 10px 0 0 10px;
+}
+
+/* Last button - round right corners */
+.btn-group>.btn-order-toggle:last-child {
+    border-radius: 0 10px 10px 0;
 }
 
 .btn-order-toggle:hover {
-    background: #fff8e8;
+    background: #fff2d1;
     color: #9a7200;
     border-color: #d49a00;
 }
@@ -94,6 +122,7 @@
     color: #fff !important;
     border-color: #e6a800 !important;
     box-shadow: none;
+    z-index: 1;
 }
 
 .btn-check:focus+.btn-order-toggle {
@@ -211,31 +240,21 @@
     background-color: #f7b801 !important;
 }
 
-/* Navbar Fixes - Specific to Order Page Header */
-.order-page-specific .navbar-brand {
-    display: flex;
-    align-items: center;
-    min-height: 4rem;
+/* Active Nav Link Highlight — shows which page the user is on */
+.nav-link.active-page {
+    background-color: rgba(247, 184, 1, 0.15) !important;
+    color: #c68e00 !important;
+    font-weight: 700 !important;
+    border-radius: 1rem !important;
 }
 
-.order-page-specific .navbar-logo img {
-    height: 3.5rem !important;
-    width: auto;
-}
-
-.order-page-specific .navbar-caption-wrap {
-    margin-left: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.order-page-specific .navbar-caption {
-    line-height: 1.2;
-    font-size: 1.4rem !important;
-    color: #000 !important;
-    display: block !important;
-    font-family: 'Source Serif 4', serif;
+.btn.active-page {
+    background-color: #dfa601 !important;
+    /* Darker shade */
+    color: #fff !important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2) !important;
+    border-color: #dfa601 !important;
+    opacity: 0.9;
 }
 
 /* Force layout order for ordering section */
@@ -246,26 +265,30 @@
     /* Cart sits at top, not middle */
 }
 
-/* Specific fix for days container to ensure left-to-right flow */
+/* Specific fix for days container: CSS Grid for equal-height cards */
 .order-page-specific #days-container {
-    justify-content: flex-start !important;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 1rem;
     text-align: left !important;
     direction: ltr !important;
-    flex-direction: row !important;
-    display: flex !important;
 }
 
-/* Nuclear option for ordering */
-.order-page-specific #days-container .col-12 {
-    float: left !important;
-}
-
-@media (min-width: 768px) {
-    .order-page-specific #days-container .col-md-6 {
-        float: left !important;
-        /* ensure flex doesn't mess it up */
-        order: initial !important;
+@media (min-width: 576px) {
+    .order-page-specific #days-container {
+        grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* Make grid children stretch full height */
+.order-page-specific #days-container>* {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+}
+
+.order-page-specific #days-container .meal-card {
+    height: 100%;
 }
 
 /* Cart Delete Button */
@@ -281,4 +304,62 @@
 
 .order-page-specific .cart-remove-btn:hover {
     color: #a71d2a;
+}
+
+/* Address Autocomplete Dropdown */
+#address-suggestions {
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #e6a800;
+    border-top: 2px solid #e6a800;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    margin-top: -1px;
+}
+
+#address-suggestions .list-group-item {
+    border: none;
+    border-bottom: 1px solid #f5f0e8;
+    transition: background 0.15s ease;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+}
+
+#address-suggestions .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#address-suggestions .list-group-item:hover,
+#address-suggestions .list-group-item[aria-selected="true"] {
+    background: #fff8e8 !important;
+    cursor: pointer;
+}
+
+#address-suggestions .list-group-item-action:active {
+    background: #f7efd8 !important;
+}
+
+/* Address input focus state */
+.order-page-specific #cust-address:focus {
+    border-color: #e6a800;
+    box-shadow: 0 0 0 0.2rem rgba(230, 168, 0, 0.2);
+}
+
+/* All checkout form inputs focus state */
+.order-page-specific #checkout-form .form-control:focus {
+    border-color: #e6a800;
+    box-shadow: 0 0 0 0.15rem rgba(230, 168, 0, 0.2);
+}
+
+/* Toast slide-down animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
