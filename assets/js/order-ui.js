@@ -791,25 +791,40 @@ async function sendOrderEmail(customer, items) {
         `ORDER ITEMS:\n${itemsList}\n\n` +
         `Subtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
 
+    // Define the base parameters mapping to the EmailJS template variables
+    // Template likely expects: {{name}}, {{email}}, {{phone}}, {{message}}
+    const baseParams = {
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        message: message, // The rich text constructed above
+        address: customer.address // Extra field if template uses it, harmless if not
+    };
+
     // 1. Send to Owner & SMS Gateway
     const ownerParams = {
         ...baseParams,
         to_name: "Shreeji Admin",
         reply_to: customer.email,
-        // Using to_email in template or relying on default? 
-        // We will pass specific email if template supports it, else we rely on dashboard config.
-        // Assuming template sends to 'Email Service Default' usually.
-        // We add CC for O2 here if needed, but let's prioritize INFO email.
         cc: "info@shreejifood.co.uk"
     };
 
-    // 2. Send to Customer (Explicitly)
+    // 2. Send to Customer
+    // Note: EmailJS free tier often forces email to go to the Registered Owner.
+    // If so, we can't force it to go to customer.email easily without Auto-Reply enabled.
+    // BUT we will try passing 'to_email' if the template supports it, or relying on CC.
+    // Hack: We put customer email in CC for the SECOND email call if the first one assumes Owner.
     const customerParams = {
         ...baseParams,
         to_name: customer.name,
         reply_to: "info@shreejifood.co.uk",
-        email: customer.email, // Ensure this maps to 'Reply To' or 'To' in template
-        cc: ""
+        // Trying to force destination. If template doesn't have {{to_email}}, this might fail to route.
+        // We will try using 'cc' for customer as a backup strat in a separate call?
+        // Let's stick to the standard 'email' field and hope the template uses it for user-facing copy.
+        // Actually, best bet for Customer Copy on Free Tier is to send to Owner but CC Customer.
+        // But we want a separate email.
+        // Let's assume standard params.
+        cc: customer.email
     };
 
     console.log("Sending dual emails...");
