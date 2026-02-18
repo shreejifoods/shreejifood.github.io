@@ -73,6 +73,51 @@ async function init() {
     }
 }
 
+// --- Telegram Bot Config ---
+const TG_BOT_TOKEN = "8237587298:AAHxenj9KPcCXj850fmz2KBcNt0Y6OllUUw";
+const TG_CHAT_ID = "8438924862";
+const sentOrderIds = new Set(); // Prevent duplicate notifications
+
+async function sendTelegramNotification(customer, items, paymentId) {
+    if (sentOrderIds.has(paymentId)) {
+        console.log("Notification already sent for:", paymentId);
+        return;
+    }
+    sentOrderIds.add(paymentId);
+
+    const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    const fee = Math.round(subtotal * ONLINE_FEE_RATE * 100) / 100;
+    const total = subtotal + deliveryCost + fee;
+
+    // Format message for Telegram
+    const itemsList = items.map(i => `• ${i.day}: ${i.name} x${i.quantity}`).join('\n');
+    const msg = `🚨 *NEW ORDER RECEIVED* 🚨\n\n` +
+        `👤 *Customer*: ${customer.name}\n` +
+        `📞 *Phone*: ${customer.phone}\n` +
+        `📧 *Email*: ${customer.email}\n` +
+        `📍 *Address*: ${customer.address}\n\n` +
+        `🛒 *Items*:\n${itemsList}\n\n` +
+        `💰 *Total Paid*: £${total.toFixed(2)}\n` +
+        `🆔 *Pay ID*: \`${paymentId}\``;
+
+    const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
+
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TG_CHAT_ID,
+                text: msg,
+                parse_mode: 'Markdown'
+            })
+        });
+        console.log("Telegram notification sent!");
+    } catch (e) {
+        console.error("Failed to send Telegram msg", e);
+    }
+}
+
 function populateDeliveryZones() {
     if (!deliveryZoneSelect) return;
     let html = '<option value="0">Select Locality...</option>';
@@ -585,35 +630,27 @@ function showOrderSuccess(customer, items) {
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NOTIFY_NUMBER}&text=${encodeURIComponent(message)}`;
 
         whatsappBtnHtml = `
-            <div class="alert alert-warning border-warning d-flex align-items-center" role="alert">
-                <span class="fs-4 me-2">⚠️</span>
-                <div><strong>Final Step:</strong> You must send the order details via WhatsApp to complete your order.</div>
+            <div class="d-grid gap-2 mb-4">
+                <a href="${whatsappUrl}" target="_blank" class="btn btn-success btn-lg d-flex align-items-center justify-content-center gap-2" 
+                   style="border-radius: 12px; font-weight: 600;">
+                   <i class="bi bi-whatsapp"></i> Send Order via WhatsApp (Optional)
+                </a>
             </div>
-            <a href="${whatsappUrl}" target="_blank" id="btn-send-whatsapp" 
-               class="btn btn-lg w-100 mb-2 py-3 d-flex align-items-center justify-content-center gap-2" 
-               style="background: #25D366; color: #fff; border: none; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); transition: transform 0.2s;">
-               <span style="font-size: 1.8rem;">📱</span> <span style="font-size: 1.1rem;">Click to Send Order</span>
-            </a>
-            <p class="text-muted small mb-4">This will open WhatsApp with your order details pre-filled.</p>
         `;
     }
-
-    // Set a flag to warn user if they try to leave without sending
-    let whatsappSent = false;
-    window.addEventListener('beforeunload', function (e) {
-        if (!whatsappSent && items.length > 0) {
-            e.preventDefault();
-            e.returnValue = ''; // Standard for modern browsers
-        }
-    });
 
     document.getElementById('menu-app').innerHTML = `
         <div class="container text-center py-5">
             <div class="card shadow border-0 p-4 p-md-5 d-inline-block" style="border-radius: 20px; max-width: 500px; width: 100%;">
-                <div class="mb-3 display-1">✅</div>
-                <h2 class="mb-2 fw-bold" style="font-family: 'Source Serif 4', serif;">Order Paid!</h2>
-                <p class="lead mb-4">Almost done, ${customer.name.split(' ')[0]}...</p>
+                <div class="mb-3 display-1 text-success">✅</div>
+                <h2 class="mb-2 fw-bold" style="font-family: 'Source Serif 4', serif;">Order Placed!</h2>
+                <p class="lead mb-4">Thank you, ${customer.name.split(' ')[0]}!</p>
                 
+                <div class="alert alert-info border-info bg-light">
+                    <i class="bi bi-envelope-check me-2"></i> 
+                    Confirmation email sent to <strong>${customer.email}</strong>
+                </div>
+
                 ${whatsappBtnHtml}
                 
                 <div class="my-4 p-3 bg-light rounded text-start">
@@ -621,7 +658,6 @@ function showOrderSuccess(customer, items) {
                         <span class="text-muted small">Payment ID:</span>
                         <code class="fw-bold text-dark">${customer.paymentId.substring(0, 12)}...</code>
                     </div>
-                    <div class="text-muted small"><i class="bi bi-file-earmark-pdf"></i> Receipt downloaded automatically</div>
                 </div>
 
                 <div class="d-flex flex-column gap-2 align-items-center mt-2">
@@ -630,21 +666,6 @@ function showOrderSuccess(customer, items) {
             </div>
         </div>
     `;
-
-    // Add click listener to disable warning
-    if (items.length > 0) {
-        setTimeout(() => {
-            const btn = document.getElementById('btn-send-whatsapp');
-            if (btn) {
-                btn.addEventListener('click', () => {
-                    whatsappSent = true;
-                    // Optional: Change button style to indicate clicked
-                    btn.classList.add('opacity-50');
-                    btn.innerText = 'Opening WhatsApp...';
-                });
-            }
-        }, 100);
-    }
 
     // Hide mobile cart bar
     const mobileBar = document.getElementById('mobile-cart-bar');
@@ -715,8 +736,13 @@ async function sendOrderEmail(customer, items) {
     const total = subtotal + deliveryCost + fee;
     const itemsList = items.map(i => `${i.day}: ${i.name} x${i.quantity}`).join('\n');
 
+    // Trigger Notifications (Email + Telegram)
+    sendOrderEmail(customer, items, customer.paymentId);
+    sendTelegramNotification(customer, items, customer.paymentId);
+
     // Consolidated message body to ensure all details are visible even if template variables are missing
-    const message = `Payment: ${customer.paymentId}\n\n` +
+    const message = `🚨 URGENT: NEW ORDER RECEIVED 🚨\n\n` +
+        `Payment ID: ${customer.paymentId}\n\n` +
         `CUSTOMER DETAILS:\n` +
         `Name: ${customer.name}\n` +
         `Phone: ${customer.phone}\n` +
@@ -727,13 +753,13 @@ async function sendOrderEmail(customer, items) {
 
     const templateParams = {
         to_name: "Shreeji Admin",
-        name: customer.name,       // Changed from from_name to match template
-        email: customer.email,     // Changed from from_email to match template
+        name: customer.name,
+        email: customer.email,
         phone: customer.phone,
         address: customer.address,
         message: message,
         reply_to: customer.email,
-        cc: "info@shreejifood.co.uk"
+        cc: `info@shreejifood.co.uk, ${customer.email}` // Send copy to Owner AND Customer
     };
 
     console.log("Sending email via EmailJS...", templateParams);
