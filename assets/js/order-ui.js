@@ -798,7 +798,9 @@ async function sendOrderEmail(customer, items) {
         email: customer.email,
         phone: customer.phone,
         message: message, // The rich text constructed above
-        address: customer.address // Extra field if template uses it, harmless if not
+        address: customer.address, // Extra field if template uses it
+        subject: `NEW ORDER: ${customer.paymentId}`, // Try to override subject
+        email_subject: `NEW ORDER: ${customer.paymentId}` // Alternate variable name
     };
 
     // 1. Send to Owner & SMS Gateway
