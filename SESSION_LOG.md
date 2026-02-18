@@ -1,7 +1,7 @@
 # Session Summary - Refinement of Order Page UX
 
 **Date:** 2026-02-17
-**Objective:** Refine address search, header consistency, and user feedback.
+**Objective:** Refine address search, header consistency, and user layout.
 
 ## Key Changes
 1.  **Address Search Refinement**:
@@ -23,9 +23,17 @@
 -   Fix visual inconsistencies (font size jumps, logo differences) between index and order pages.
 -   Highlight the current page ("Order Online") in the navbar.
 
-## Payment & Check Updates (2026-02-18)
+## Payment & Notification Updates (2026-02-18)
 - **Fee Update**: Changed online ordering fee from 3% to 2% in `order-ui.js`, PDF generator, and HTML labels.
-- **PayPal Integration**: Uncommented PayPal SDK script in `order.html` (using 'sb' sandbox placeholder). Verified buttons render correctly.
-- **Notifications**: Updated WhatsApp message format to explicitly list items with their meal date (e.g., `📅 [Monday]: Paneer...`). Added `cc` and `reply_to` parameters to EmailJS calls to include `info@shreejifood.co.uk`.
-- **Error Handling**: Added `onCancel` handler for PayPal and improved error alerting.
-- **Accessibility**: Added `aria-label` attributes to checkout form inputs and "Add to Order" buttons.
+- **PayPal Integration**: Verified Sandbox flow.
+- **Notifications**: 
+    - Updated WhatsApp message format to explicitly list items with their meal date.
+    - Added `cc` and `reply_to` to EmailJS calls.
+    - **Fix**: Removed conflicting EmailJS v3 script from `order.html` which might have blocked email sending. Verified configuration is valid.
+- **Error Handling**: Added `onCancel` handler for PayPal.
+
+## UI Enhancements (2026-02-18)
+- **Image Zoom**: Implemented a clickable lightbox modal for daily meal set images.
+    - Created `assets/css/image-modal.css`.
+    - Added modal markup to `order.html`.
+    - Updated `order-ui.js` to handle click events and image extraction.

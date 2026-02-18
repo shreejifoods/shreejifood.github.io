@@ -187,7 +187,11 @@ function renderMenu(menuData) {
             <div class="${colClass}">
                 <div class="card w-100 shadow-sm border-0 meal-card h-100" style="transition: transform 0.2s;">
                     <div class="card-body d-flex align-items-start gap-3 p-3">
-                        <div class="day-meal-image ${day.toLowerCase()}-img"></div>
+                        <div class="day-meal-image ${day.toLowerCase()}-img" 
+                             onclick="openMealImage(this, '${day}')" 
+                             title="Click to zoom image"
+                             role="button"
+                             aria-label="View larger image for ${day}"></div>
                         <div class="flex-grow-1 d-flex flex-column" style="min-height: 100%;">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="card-title fw-bold mb-0" style="font-family: 'Source Serif 4', serif; color: #3d2e00;">
@@ -885,6 +889,37 @@ function showToast(msg) {
         }
     });
 })();
+
+// --- Image Modal Logic ---
+window.openMealImage = (element, day) => {
+    const modal = document.getElementById("meal-image-modal");
+    const modalImg = document.getElementById("img01");
+    const captionText = document.getElementById("modal-caption");
+
+    // Get background image URL
+    const style = window.getComputedStyle(element);
+    const bgImage = style.backgroundImage;
+
+    // Extract URL from url("...")
+    // Handles quotes or no quotes
+    const urlMatch = bgImage.match(/url\(["']?([^"']*)["']?\)/);
+
+    if (urlMatch && urlMatch[1]) {
+        modal.style.display = "block";
+        modalImg.src = urlMatch[1];
+        captionText.innerHTML = `Scanning details for <strong>${day}'s Meal Set</strong>`;
+    }
+};
+
+window.closeImageModal = () => {
+    const modal = document.getElementById("meal-image-modal");
+    if (modal) modal.style.display = "none";
+};
+
+// Close modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') window.closeImageModal();
+});
 
 init();
 

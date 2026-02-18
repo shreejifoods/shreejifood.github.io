@@ -61,12 +61,12 @@
 
     <!-- Custom CSS (Loaded Last) -->
     <link rel="stylesheet" href="assets/css/custom.css?v=9">
+    <link rel="stylesheet" href="assets/css/image-modal.css">
 
     <!-- External Libs -->
     <!-- PayPal SDK: Replace YOUR_PAYPAL_CLIENT_ID with your real PayPal client ID to enable payments -->
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=GBP" defer></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
-        defer></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
     <!-- Structured Data / Schema.org -->
@@ -344,6 +344,13 @@
                 </div>
             </div>
         </section>
+
+        <!-- Image Zoom Modal -->
+        <div id="meal-image-modal" class="image-modal" onclick="closeImageModal()">
+            <span class="close-modal">&times;</span>
+            <img class="image-modal-content" id="img01">
+            <div id="modal-caption"></div>
+        </div>
     </main>
 
     <!-- Floating Mobile Cart Bar (visible only on mobile when items in cart) -->
@@ -388,7 +395,7 @@
     <!-- App Logic -->
     <script src="assets/js/order-logic.js?v=2"></script>
     <script src="assets/js/cart-logic.js?v=2"></script>
-    <script src="assets/js/order-ui.js?v=10"></script>
+    <script src="assets/js/order-ui.js?v=11"></script>
 
     <!-- Zoom Effect -->
     <script>
