@@ -806,25 +806,18 @@ async function sendOrderEmail(customer, items) {
         ...baseParams,
         to_name: "Shreeji Admin",
         reply_to: customer.email,
-        cc: "info@shreejifood.co.uk"
+        cc: ""
     };
 
     // 2. Send to Customer
-    // Note: EmailJS free tier often forces email to go to the Registered Owner.
-    // If so, we can't force it to go to customer.email easily without Auto-Reply enabled.
-    // BUT we will try passing 'to_email' if the template supports it, or relying on CC.
-    // Hack: We put customer email in CC for the SECOND email call if the first one assumes Owner.
+    // Trying 'to_email' and 'recipient' to hit common template variable names for destination.
     const customerParams = {
         ...baseParams,
         to_name: customer.name,
         reply_to: "info@shreejifood.co.uk",
-        // Trying to force destination. If template doesn't have {{to_email}}, this might fail to route.
-        // We will try using 'cc' for customer as a backup strat in a separate call?
-        // Let's stick to the standard 'email' field and hope the template uses it for user-facing copy.
-        // Actually, best bet for Customer Copy on Free Tier is to send to Owner but CC Customer.
-        // But we want a separate email.
-        // Let's assume standard params.
-        cc: customer.email
+        to_email: customer.email, // Common variable for To field
+        recipient: customer.email, // Another common one
+        cc: customer.email // Keep CC just in case it works
     };
 
     console.log("Sending dual emails...");
