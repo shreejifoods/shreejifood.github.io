@@ -22,3 +22,7 @@
 -   Ensure smooth address selection experience.
 -   Fix visual inconsistencies (font size jumps, logo differences) between index and order pages.
 -   Highlight the current page ("Order Online") in the navbar.
+
+## Payment Integration (2026-02-18)
+- **Fee Update**: Changed online ordering fee from 3% to 2% in `order-ui.js`, PDF generator, and HTML labels.
+- **PayPal Integration**: Uncommented PayPal SDK script in `order.html` (using 'sb' sandbox placeholder). Verified buttons render correctly.

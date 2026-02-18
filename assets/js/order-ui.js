@@ -32,8 +32,8 @@ let currentOrderType = 'pickup';
 let deliveryCost = 0;
 let paypalRendered = false;
 
-// Online ordering fee (3%) to cover payment processing costs
-const ONLINE_FEE_RATE = 0.03;
+// Online ordering fee (2%) to cover payment processing costs
+const ONLINE_FEE_RATE = 0.02;
 const cartServiceFeeEl = document.getElementById('cart-service-fee');
 
 // WhatsApp notification number (international format, no +)
@@ -583,7 +583,7 @@ function generateInvoicePDF(customer, items) {
     doc.line(20, y, 190, y); y += 7;
     doc.text(`Subtotal: £${subtotal.toFixed(2)}`, 20, y); y += 6;
     doc.text(`Delivery: £${deliveryCost.toFixed(2)}`, 20, y); y += 6;
-    doc.text(`Service Fee (3%): £${fee.toFixed(2)}`, 20, y); y += 6;
+    doc.text(`Service Fee (2%): £${fee.toFixed(2)}`, 20, y); y += 6;
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
     doc.text(`Total: £${total.toFixed(2)}`, 20, y);
