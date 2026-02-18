@@ -67,6 +67,14 @@
     <!-- PayPal SDK: Replace YOUR_PAYPAL_CLIENT_ID with your real PayPal client ID to enable payments -->
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=GBP" defer></script>
 
+    <!-- EmailJS SDK v4 (Loaded immediately to ensure readiness) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            emailjs.init("byjrGBN3r1SvvFFhJ");
+        })();
+    </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
     <!-- Structured Data / Schema.org -->
@@ -395,7 +403,7 @@
     <!-- App Logic -->
     <script src="assets/js/order-logic.js?v=2"></script>
     <script src="assets/js/cart-logic.js?v=2"></script>
-    <script src="assets/js/order-ui.js?v=11"></script>
+    <script src="assets/js/order-ui.js?v=12"></script>
 
     <!-- Zoom Effect -->
     <script>

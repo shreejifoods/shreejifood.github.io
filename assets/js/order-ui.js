@@ -471,20 +471,23 @@ function renderPayPalButtons() {
                 // Send WhatsApp notification to the business owner
                 sendWhatsAppNotification(customer, window.cart.items);
 
-                // Generate PDF Receipt
-                const pdfBlob = generateInvoicePDF(customer, window.cart.items);
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(pdfBlob);
-                link.download = `Invoice_${Date.now()}.pdf`;
-                link.click();
+                // Generate PDF Receipt (User downloads it)
+                try {
+                    const pdfBlob = generateInvoicePDF(customer, window.cart.items);
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(pdfBlob);
+                    link.download = `Invoice_${Date.now()}.pdf`;
+                    link.click();
+                } catch (pdfErr) {
+                    console.error("PDF generation failed", pdfErr);
+                }
 
                 window.cart.clear();
-                showOrderSuccess(customer);
+                showOrderSuccess(customer, window.cart.items); // Pass items for WhatsApp button
             } catch (err) {
-                console.error(err);
-                // Still send WhatsApp even if email fails
-                sendWhatsAppNotification(customer, window.cart.items);
-                alert('Payment received but order notification failed. Please contact us.');
+                console.error("Order process error:", err);
+                alert('Warning: Order notification issue. Please use the WhatsApp button on the next screen.');
+                showOrderSuccess(customer, window.cart.items);
             }
         },
         onError: function (err) {
@@ -530,17 +533,65 @@ function sendWhatsAppNotification(customer, items) {
 }
 
 // --- Order Success Page ---
-function showOrderSuccess(customer) {
+function showOrderSuccess(customer, items) {
+    if (!items || items.length === 0) {
+        // Fallback if items cleared already (shouldn't happen with correct flow)
+        items = [];
+    }
+
+    // Check if we can reconstruct the WhatsApp link
+    let whatsappBtnHtml = '';
+    if (items.length > 0) {
+        const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+        // Recalculate based on known fee rate
+        const fee = Math.round(subtotal * ONLINE_FEE_RATE * 100) / 100;
+        // Don't have delivery cost easily here unless globally available (it is: deliveryCost global var)
+        const total = subtotal + deliveryCost + fee;
+
+        const itemsList = items.map(i => `📅 *[${i.day}]:* ${i.name} ×${i.quantity}`).join('\n');
+
+        const message = `🍛 *NEW ORDER - Shreeji Food*\n\n` +
+            `👤 *Customer:* ${customer.name}\n` +
+            `📞 *Phone:* ${customer.phone}\n` +
+            `📧 *Email:* ${customer.email || 'N/A'}\n` +
+            `📍 *Type:* ${customer.type === 'delivery' ? 'Delivery' : 'Pickup'}\n` +
+            (customer.address ? `🏠 *Address:* ${customer.address}\n` : '') +
+            (customer.range ? `🗺️ *Zone:* ${customer.range}\n` : '') +
+            `\n📋 *Order Items (Delivery per Meal Date):*\n${itemsList}\n` +
+            `\n_(Please deliver items on their respective days)_\n\n` +
+            `💰 *Subtotal:* £${subtotal.toFixed(2)}\n` +
+            `📦 *Delivery:* ${typeof deliveryCost !== 'undefined' ? '£' + deliveryCost.toFixed(2) : 'N/A'}\n` +
+            `🔧 *Service Fee:* £${fee.toFixed(2)}\n` +
+            `💵 *Total:* £${total.toFixed(2)}\n\n` +
+            `💳 *Payment:* ${customer.paymentId}`;
+
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NOTIFY_NUMBER}&text=${encodeURIComponent(message)}`;
+
+        whatsappBtnHtml = `
+            <a href="${whatsappUrl}" target="_blank" class="btn btn-lg w-100 mb-3 d-flex align-items-center justify-content-center gap-2" 
+               style="background: #25D366; color: #fff; border: none; border-radius: 8px; font-weight: bold;">
+               <span style="font-size: 1.5rem;">📱</span> Send Order to WhatsApp
+            </a>
+            <p class="text-muted small">Important: You must click the button above to send the order details to us!</p>
+        `;
+    }
+
     document.getElementById('menu-app').innerHTML = `
         <div class="container text-center py-5">
-            <div class="card shadow border-0 p-5 d-inline-block" style="border-radius: 16px; max-width: 500px;">
+            <div class="card shadow border-0 p-5 d-inline-block" style="border-radius: 16px; max-width: 500px; width: 100%;">
                 <div class="mb-3" style="font-size: 3rem;">✅</div>
                 <h2 class="mb-3" style="font-family: 'Source Serif 4', serif;">Order Placed Successfully!</h2>
                 <p class="text-muted">Thank you, ${customer.name}!</p>
-                <p class="text-muted small">Payment: ${customer.paymentId}</p>
-                <p class="text-muted">A receipt has been downloaded. Please confirm your order via WhatsApp.</p>
+                <div class="my-4 p-3 bg-light rounded">
+                    <p class="mb-1 text-muted small">Payment ID:</p>
+                    <code class="fw-bold text-dark">${customer.paymentId}</code>
+                </div>
+                
+                ${whatsappBtnHtml}
+                
+                <p class="text-muted small mt-2">A receipt has been downloaded.</p>
                 <div class="d-flex flex-column gap-2 align-items-center mt-3">
-                    <a href="index.html" class="btn" style="background: #e6a800; color: #fff; border-radius: 8px; padding: 8px 24px;">Back to Home</a>
+                    <a href="index.html" class="btn btn-outline-secondary" style="border-radius: 8px; padding: 8px 24px;">Back to Home</a>
                 </div>
             </div>
         </div>
@@ -602,26 +653,51 @@ function generateInvoicePDF(customer, items) {
 }
 
 async function sendOrderEmail(customer, items) {
-    if (typeof emailjs === 'undefined') return;
+    // Force verify emailjs presence, warn if missing
+    if (typeof emailjs === 'undefined') {
+        console.error("EmailJS not loaded! Order email skipped.");
+        alert("Warning: Email service unavailable. Please check your network or contact us.");
+        return;
+    }
 
-    const subtotal = window.cart.getTotal();
+    const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0); // Recalculate cleanly
     const fee = Math.round(subtotal * ONLINE_FEE_RATE * 100) / 100;
     const total = subtotal + deliveryCost + fee;
     const itemsList = items.map(i => `${i.day}: ${i.name} x${i.quantity}`).join('\n');
 
-    const message = `Payment: ${customer.paymentId}\n${itemsList}\nSubtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
+    // Consolidated message body to ensure all details are visible even if template variables are missing
+    const message = `Payment: ${customer.paymentId}\n\n` +
+        `CUSTOMER DETAILS:\n` +
+        `Name: ${customer.name}\n` +
+        `Phone: ${customer.phone}\n` +
+        `Email: ${customer.email}\n` +
+        `Address: ${customer.address}\n\n` +
+        `ORDER ITEMS:\n${itemsList}\n\n` +
+        `Subtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
 
     const templateParams = {
         to_name: "Shreeji Admin",
-        from_name: customer.name,
-        from_email: customer.email,
+        name: customer.name,       // Changed from from_name to match template
+        email: customer.email,     // Changed from from_email to match template
         phone: customer.phone,
         address: customer.address,
         message: message,
         reply_to: customer.email,
         cc: "info@shreejifood.co.uk"
     };
-    return emailjs.send("service_ejwyzx8", "template_djqwoxj", templateParams);
+
+    console.log("Sending email via EmailJS...", templateParams);
+
+    return emailjs.send("service_ejwyzx8", "template_djqwoxj", templateParams)
+        .then(res => {
+            console.log("Email sent successfully!", res.status, res.text);
+            return res;
+        })
+        .catch(err => {
+            console.error("Email send failed:", err);
+            // Don't throw, just log. The order is paid.
+            alert("Note: Order email failed to send. Please save your receipt.");
+        });
 }
 
 function showToast(msg) {

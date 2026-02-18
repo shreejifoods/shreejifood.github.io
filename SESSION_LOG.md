@@ -29,7 +29,9 @@
 - **Notifications**: 
     - Updated WhatsApp message format to explicitly list items with their meal date.
     - Added `cc` and `reply_to` to EmailJS calls.
-    - **Fix**: Removed conflicting EmailJS v3 script from `order.html` which might have blocked email sending. Verified configuration is valid.
+    - **Fix**: Removed conflicting EmailJS v3 script from `order.html`.
+    - **Fix**: Aligned EmailJS parameters (`name`, `email`) with working contact form logic.
+    - **Update**: Consolidated customer details (incl. Address) into main Message body to ensure visibility.
 - **Error Handling**: Added `onCancel` handler for PayPal.
 
 ## UI Enhancements (2026-02-18)
