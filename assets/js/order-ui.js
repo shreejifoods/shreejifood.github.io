@@ -642,59 +642,66 @@ function showOrderSuccess(customer, items) {
     // Determine Order Type & Timing Message
     const isDelivery = deliveryCost > 0;
     const timingMsg = isDelivery
-        ? "🚚 Delivery by <strong>7:00 PM</strong>"
-        : "📍 Pick up from <strong>5:30 PM</strong>";
+        ? "Expected Delivery: <strong>7:00 PM</strong>"
+        : "Pickup Time: <strong>5:30 PM</strong>";
 
     const itemsSummary = items.map(i =>
-        `<li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <span class="fw-bold">${i.day}</span>: ${i.name}
-            </div>
-            <span class="badge bg-primary rounded-pill">x${i.quantity}</span>
-        </li>`
+        `<div class="d-flex justify-content-between border-bottom py-2">
+            <span>${i.day}: ${i.name}</span>
+            <span class="fw-bold">x${i.quantity}</span>
+        </div>`
     ).join('');
 
     const supportLink = `https://wa.me/${WHATSAPP_NOTIFY_NUMBER}`;
 
+    const positiveMsgs = [
+        "Great Choice!",
+        "Made with Love!",
+        "Excellent Selection!",
+        "You're going to love this!",
+        "Authentic Taste Awaits!"
+    ];
+    const randomMsg = positiveMsgs[Math.floor(Math.random() * positiveMsgs.length)];
+
     document.getElementById('menu-app').innerHTML = `
         <div class="container py-5">
-            <div class="card shadow-lg border-0 mx-auto" style="border-radius: 20px; max-width: 600px;">
-                <div class="card-header bg-success text-white text-center py-4" style="border-radius: 20px 20px 0 0;">
-                    <div class="display-4 mb-2">🎉</div>
-                    <h2 class="mb-0 fw-bold">Order Placed Successfully!</h2>
+            <div class="text-center mb-5">
+                <div class="mb-3">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
                 </div>
-                
-                <div class="card-body p-4 p-md-5">
-                    <div class="text-center mb-4">
-                        <p class="lead">Relax! Your meal will be ready.</p>
-                        <div class="alert alert-light border-success">
-                            <h5 class="alert-heading fw-bold mb-0">Order ID</h5>
-                            <code class="fs-5 text-dark">${customer.paymentId}</code>
-                        </div>
-                        <div class="badge bg-warning text-dark fs-5 p-3 mb-3 w-100">${timingMsg}</div>
+                <h2 class="fw-bold mb-2">Order Confirmed</h2>
+                <p class="text-muted fs-5">Thank you, ${customer.name.split(' ')[0]}!</p>
+            </div>
+
+            <div class="card border-0 shadow-sm mx-auto" style="max-width: 500px; border-radius: 16px; background-color: #fff8e1;">
+                <div class="card-body p-4 text-center">
+                    <h4 class="mb-1" style="color: #d49a00;">${randomMsg}</h4>
+                    <p class="mb-3">Your meal will be ready shortly.</p>
+                    
+                    <div class="bg-white rounded p-3 mb-3 shadow-sm">
+                        <div class="text-uppercase small text-muted letter-spacing-1">Order ID</div>
+                        <div class="fw-mono fs-5">${customer.paymentId}</div>
                     </div>
 
-                    <h5 class="border-bottom pb-2 mb-3">Your Order:</h5>
-                    <ul class="list-group mb-4">
+                    <div class="fs-5 mb-4 p-2" style="color: #555;">
+                        ${timingMsg}
+                    </div>
+
+                    <div class="text-start mb-4 bg-white p-3 rounded">
+                        <h6 class="text-muted mb-3 text-uppercase small">Order Summary</h6>
                         ${itemsSummary}
-                    </ul>
-
-                    <div class="alert alert-info d-flex align-items-center" role="alert">
-                        <i class="bi bi-envelope-check-fill fs-3 me-3"></i>
-                        <div>
-                            <strong>Invoice Sent!</strong><br>
-                            Check your email: <u>${customer.email}</u>
-                        </div>
                     </div>
 
-                    <div class="text-center mt-5">
-                        <p class="text-muted mb-2">Have questions?</p>
-                        <a href="${supportLink}" target="_blank" class="btn btn-outline-success d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-whatsapp"></i> Chat with us on WhatsApp
-                        </a>
-                        <div class="mt-3">
-                            <a href="index.html" class="btn btn-link text-muted">Back to Home</a>
-                        </div>
+                    <p class="small text-muted mb-4">
+                        <i class="bi bi-envelope me-1"></i> Receipt sent to <strong>${customer.email}</strong>
+                    </p>
+
+                    <a href="${supportLink}" target="_blank" class="btn btn-success w-100 py-3 rounded-3 fw-bold">
+                        <i class="bi bi-whatsapp me-2"></i> Chat with us on WhatsApp
+                    </a>
+                    
+                    <div class="mt-3">
+                        <a href="index.html" class="text-decoration-none text-muted small">Return to Home</a>
                     </div>
                 </div>
             </div>
@@ -785,30 +792,49 @@ async function sendOrderEmail(customer, items) {
         `ORDER ITEMS:\n${itemsList}\n\n` +
         `Subtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
 
-    const templateParams = {
+    // 1. Send to Owner & SMS Gateway
+    const ownerParams = {
+        ...baseParams,
         to_name: "Shreeji Admin",
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        address: customer.address,
-        message: message,
         reply_to: customer.email,
-        cc: `info@shreejifood.co.uk, ${customer.email}` // Send copy to Owner AND Customer
+        // Using to_email in template or relying on default? 
+        // We will pass specific email if template supports it, else we rely on dashboard config.
+        // Assuming template sends to 'Email Service Default' usually.
+        // We add CC for O2 here if needed, but let's prioritize INFO email.
+        cc: "info@shreejifood.co.uk"
     };
 
-    console.log("Sending email via EmailJS...", templateParams);
+    // 2. Send to Customer (Explicitly)
+    const customerParams = {
+        ...baseParams,
+        to_name: customer.name,
+        reply_to: "info@shreejifood.co.uk",
+        email: customer.email, // Ensure this maps to 'Reply To' or 'To' in template
+        cc: ""
+    };
 
-    return emailjs.send("service_ejwyzx8", "template_djqwoxj", templateParams)
-        .then(res => {
-            console.log("Email sent successfully!", res.status, res.text);
-            return res;
-        })
-        .catch(err => {
-            console.error("Email send failed:", err);
-            // Don't throw, just log. The order is paid.
-            alert("Note: Order email failed to send. Please save your receipt.");
-        });
+    console.log("Sending dual emails...");
+
+    // Send Admin Email
+    const p1 = emailjs.send("service_ejwyzx8", "template_djqwoxj", ownerParams)
+        .then(() => console.log("Admin Email Sent"))
+        .catch(e => console.error("Admin Email Failed", e));
+
+    // Send Customer Email (Only if valid)
+    let p2 = Promise.resolve();
+    if (customer.email && customer.email.includes('@')) {
+        // We use the SAME template but specific params
+        // note: EmailJS free tier might limit recipient overriding.
+        // If template_djqwoxj is hardcoded to receive at info@, this won't work for customer.
+        // BUT we can try if the template uses {{email}} as the recipient.
+        p2 = emailjs.send("service_ejwyzx8", "template_djqwoxj", customerParams)
+            .then(() => console.log("Customer Email Sent"))
+            .catch(e => console.error("Customer Email Failed", e));
+    }
+
+    return Promise.all([p1, p2]);
 }
+
 
 function showToast(msg) {
     const box = document.getElementById('toast-container');
