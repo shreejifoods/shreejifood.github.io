@@ -777,8 +777,7 @@ async function sendOrderEmail(customer, items) {
     const total = subtotal + deliveryCost + fee;
     const itemsList = items.map(i => `${i.day}: ${i.name} x${i.quantity}`).join('\n');
 
-    // Trigger Notifications (Email + Telegram)
-    sendOrderEmail(customer, items, customer.paymentId);
+    // Trigger Telegram Notification
     sendTelegramNotification(customer, items, customer.paymentId);
 
     // Consolidated message body to ensure all details are visible even if template variables are missing
