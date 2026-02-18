@@ -203,7 +203,8 @@ function renderMenu(menuData) {
                             <button class="btn btn-sm mt-auto w-100 d-flex align-items-center justify-content-center py-2" 
                                 style="background: #e6a800; color: #fff; border: none; border-radius: 8px; font-weight: 600;"
                                 onmouseover="this.style.background='#d49a00'" onmouseout="this.style.background='#e6a800'"
-                                onclick="addItemToCart('${mainItem.id}', '${mainItem.name}', ${mainItem.price}, '${day}')">
+                                onclick="addItemToCart('${mainItem.id}', '${mainItem.name}', ${mainItem.price}, '${day}')"
+                                aria-label="Add ${day}'s meal (${mainItem.name}) to order">
                                 + Add to Order
                             </button>
                         </div>
@@ -484,7 +485,11 @@ function renderPayPalButtons() {
         },
         onError: function (err) {
             console.error('PayPal error:', err);
-            alert('Payment failed. Please try again or contact us.');
+            alert('Payment failed. Please try again or contact us if the issue persists.');
+        },
+        onCancel: function (data) {
+            console.log('Payment cancelled', data);
+            showToast('Payment cancelled. You can try again.');
         }
     }).render('#paypal-button-container');
 }
@@ -495,7 +500,7 @@ function sendWhatsAppNotification(customer, items) {
     const fee = Math.round(subtotal * ONLINE_FEE_RATE * 100) / 100;
     const total = subtotal + deliveryCost + fee;
 
-    const itemsList = items.map(i => `• ${i.day}: ${i.name} ×${i.quantity}`).join('\n');
+    const itemsList = items.map(i => `📅 *[${i.day}]:* ${i.name} ×${i.quantity}`).join('\n');
 
     const message = `🍛 *NEW ORDER - Shreeji Food*\n\n` +
         `👤 *Customer:* ${customer.name}\n` +
@@ -504,7 +509,8 @@ function sendWhatsAppNotification(customer, items) {
         `📍 *Type:* ${customer.type === 'delivery' ? 'Delivery' : 'Pickup'}\n` +
         (customer.address ? `🏠 *Address:* ${customer.address}\n` : '') +
         (customer.range ? `🗺️ *Zone:* ${customer.range}\n` : '') +
-        `\n📋 *Order Items:*\n${itemsList}\n\n` +
+        `\n📋 *Order Items (Delivery per Meal Date):*\n${itemsList}\n` +
+        `\n_(Please deliver items on their respective days)_\n\n` +
         `💰 *Subtotal:* £${subtotal.toFixed(2)}\n` +
         `📦 *Delivery:* £${deliveryCost.toFixed(2)}\n` +
         `🔧 *Service Fee:* £${fee.toFixed(2)}\n` +
@@ -607,7 +613,9 @@ async function sendOrderEmail(customer, items) {
         from_email: customer.email,
         phone: customer.phone,
         address: customer.address,
-        message: message
+        message: message,
+        reply_to: customer.email,
+        cc: "info@shreejifood.co.uk"
     };
     return emailjs.send("service_ejwyzx8", "template_djqwoxj", templateParams);
 }

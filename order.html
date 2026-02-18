@@ -241,9 +241,10 @@
                                                 Enter Postcode</label>
                                             <div class="input-group mb-2">
                                                 <input type="text" id="delivery-postcode" class="form-control"
-                                                    placeholder="e.g. AL10 9AB"
+                                                    placeholder="e.g. AL10 9AB" aria-label="Enter your postcode"
                                                     style="text-transform: uppercase; border-radius: 8px 0 0 8px; padding: 10px 14px; font-size: 0.9rem; border-color: #e6a800;">
                                                 <button class="btn" type="button" id="btn-check-postcode"
+                                                    aria-label="Check postcode"
                                                     style="border-radius: 0 8px 8px 0; background: linear-gradient(135deg, #e6a800, #d49a00); color: #fff; font-weight: 600; padding: 0 22px; font-size: 0.9rem; border: 2px solid #d49a00; transition: all 0.2s ease;">✓
                                                     Check</button>
                                             </div>
@@ -300,22 +301,25 @@
                                             <div class="row g-2">
                                                 <div class="col-12 mb-2">
                                                     <input type="text" class="form-control" id="cust-name"
-                                                        placeholder="👤  Your full name" required
+                                                        placeholder="👤  Your full name" required aria-label="Full Name"
                                                         style="padding: 10px 14px; font-size: 0.9rem;">
                                                 </div>
                                                 <div class="col-12 mb-2">
                                                     <input type="tel" class="form-control" id="cust-phone"
                                                         placeholder="📞  Phone number" required
+                                                        aria-label="Phone Number"
                                                         style="padding: 10px 14px; font-size: 0.9rem;">
                                                 </div>
                                                 <div class="col-12 mb-2">
                                                     <input type="email" class="form-control" id="cust-email"
                                                         placeholder="✉️  Email address" required
+                                                        aria-label="Email Address"
                                                         style="padding: 10px 14px; font-size: 0.9rem;">
                                                 </div>
                                                 <div class="col-12 mb-2 position-relative">
                                                     <input type="text" class="form-control" id="cust-address"
                                                         autocomplete="street-address" required
+                                                        aria-label="Delivery Address"
                                                         placeholder="📍  Start typing your address..."
                                                         style="padding: 10px 14px; font-size: 0.9rem;">
                                                     <ul id="address-suggestions"
