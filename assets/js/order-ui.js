@@ -585,34 +585,67 @@ function showOrderSuccess(customer, items) {
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NOTIFY_NUMBER}&text=${encodeURIComponent(message)}`;
 
         whatsappBtnHtml = `
-            <a href="${whatsappUrl}" target="_blank" class="btn btn-lg w-100 mb-3 d-flex align-items-center justify-content-center gap-2" 
-               style="background: #25D366; color: #fff; border: none; border-radius: 8px; font-weight: bold;">
-               <span style="font-size: 1.5rem;">📱</span> Send Order to WhatsApp
+            <div class="alert alert-warning border-warning d-flex align-items-center" role="alert">
+                <span class="fs-4 me-2">⚠️</span>
+                <div><strong>Final Step:</strong> You must send the order details via WhatsApp to complete your order.</div>
+            </div>
+            <a href="${whatsappUrl}" target="_blank" id="btn-send-whatsapp" 
+               class="btn btn-lg w-100 mb-2 py-3 d-flex align-items-center justify-content-center gap-2" 
+               style="background: #25D366; color: #fff; border: none; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); transition: transform 0.2s;">
+               <span style="font-size: 1.8rem;">📱</span> <span style="font-size: 1.1rem;">Click to Send Order</span>
             </a>
-            <p class="text-muted small">Important: You must click the button above to send the order details to us!</p>
+            <p class="text-muted small mb-4">This will open WhatsApp with your order details pre-filled.</p>
         `;
     }
 
+    // Set a flag to warn user if they try to leave without sending
+    let whatsappSent = false;
+    window.addEventListener('beforeunload', function (e) {
+        if (!whatsappSent && items.length > 0) {
+            e.preventDefault();
+            e.returnValue = ''; // Standard for modern browsers
+        }
+    });
+
     document.getElementById('menu-app').innerHTML = `
         <div class="container text-center py-5">
-            <div class="card shadow border-0 p-5 d-inline-block" style="border-radius: 16px; max-width: 500px; width: 100%;">
-                <div class="mb-3" style="font-size: 3rem;">✅</div>
-                <h2 class="mb-3" style="font-family: 'Source Serif 4', serif;">Order Placed Successfully!</h2>
-                <p class="text-muted">Thank you, ${customer.name}!</p>
-                <div class="my-4 p-3 bg-light rounded">
-                    <p class="mb-1 text-muted small">Payment ID:</p>
-                    <code class="fw-bold text-dark">${customer.paymentId}</code>
-                </div>
+            <div class="card shadow border-0 p-4 p-md-5 d-inline-block" style="border-radius: 20px; max-width: 500px; width: 100%;">
+                <div class="mb-3 display-1">✅</div>
+                <h2 class="mb-2 fw-bold" style="font-family: 'Source Serif 4', serif;">Order Paid!</h2>
+                <p class="lead mb-4">Almost done, ${customer.name.split(' ')[0]}...</p>
                 
                 ${whatsappBtnHtml}
                 
-                <p class="text-muted small mt-2">A receipt has been downloaded.</p>
-                <div class="d-flex flex-column gap-2 align-items-center mt-3">
-                    <a href="index.html" class="btn btn-outline-secondary" style="border-radius: 8px; padding: 8px 24px;">Back to Home</a>
+                <div class="my-4 p-3 bg-light rounded text-start">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Payment ID:</span>
+                        <code class="fw-bold text-dark">${customer.paymentId.substring(0, 12)}...</code>
+                    </div>
+                    <div class="text-muted small"><i class="bi bi-file-earmark-pdf"></i> Receipt downloaded automatically</div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 align-items-center mt-2">
+                    <a href="index.html" class="btn btn-link text-muted" style="text-decoration: none;">Back to Home</a>
                 </div>
             </div>
         </div>
     `;
+
+    // Add click listener to disable warning
+    if (items.length > 0) {
+        setTimeout(() => {
+            const btn = document.getElementById('btn-send-whatsapp');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    whatsappSent = true;
+                    // Optional: Change button style to indicate clicked
+                    btn.classList.add('opacity-50');
+                    btn.innerText = 'Opening WhatsApp...';
+                });
+            }
+        }, 100);
+    }
+
     // Hide mobile cart bar
     const mobileBar = document.getElementById('mobile-cart-bar');
     if (mobileBar) mobileBar.style.display = 'none';

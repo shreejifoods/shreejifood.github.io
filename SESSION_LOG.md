@@ -37,3 +37,8 @@
 ## Order Logic Refinements (2026-02-18)
 - **Time Cutoff**: Confirmed logic implementation of 1:00 PM (13:00) cutoff for same-day orders. Updated comments to reflect this vs old 2:00 PM text.
 - **Cart Cleanup**: Implemented automatic cart validation on page load. Items belonging to days that are no longer available (past days or today after 1pm) are now automatically removed with a user notification.
+
+## WhatsApp Reliability (2026-02-18)
+- **Prominence**: Redesigned the "Order Success" screen to make the "Send to WhatsApp" button the large, primary action.
+- **Warning**: Added `beforeunload` event listener to warn users if they attempt to close the page without clicking the "Send to WhatsApp" button.
+- **Confirmation**: Added visual feedback (button dimming/text change) upon clicking the button.
