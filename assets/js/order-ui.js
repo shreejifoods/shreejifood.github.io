@@ -835,12 +835,14 @@ async function sendOrderEmail(customer, items) {
         .then(() => console.log("Owner Email Sent"))
         .catch(e => console.error("Owner Email Failed", e));
 
+    /*
     if (customer.email && customer.email.includes('@')) {
-        console.log("Sending Customer Email...");
-        emailjs.send("service_ejwyzx8", "template_djqwoxj", customerParams)
-            .then(() => console.log("Customer Email Sent"))
-            .catch(e => console.error("Customer Email Failed", e));
+        console.log("Sending Customer Email (DISABLED: Fix Template First)");
+        // emailjs.send("service_ejwyzx8", "template_djqwoxj", customerParams)
+        //     .then(() => console.log("Customer Email Sent"))
+        //     .catch(e => console.error("Customer Email Failed", e));
     }
+    */
 }
 
 
