@@ -639,29 +639,63 @@ function showOrderSuccess(customer, items) {
         `;
     }
 
+    // Determine Order Type & Timing Message
+    const isDelivery = deliveryCost > 0;
+    const timingMsg = isDelivery
+        ? "🚚 Delivery by <strong>7:00 PM</strong>"
+        : "📍 Pick up from <strong>5:30 PM</strong>";
+
+    const itemsSummary = items.map(i =>
+        `<li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <span class="fw-bold">${i.day}</span>: ${i.name}
+            </div>
+            <span class="badge bg-primary rounded-pill">x${i.quantity}</span>
+        </li>`
+    ).join('');
+
+    const supportLink = `https://wa.me/${WHATSAPP_NOTIFY_NUMBER}`;
+
     document.getElementById('menu-app').innerHTML = `
-        <div class="container text-center py-5">
-            <div class="card shadow border-0 p-4 p-md-5 d-inline-block" style="border-radius: 20px; max-width: 500px; width: 100%;">
-                <div class="mb-3 display-1 text-success">✅</div>
-                <h2 class="mb-2 fw-bold" style="font-family: 'Source Serif 4', serif;">Order Placed!</h2>
-                <p class="lead mb-4">Thank you, ${customer.name.split(' ')[0]}!</p>
-                
-                <div class="alert alert-info border-info bg-light">
-                    <i class="bi bi-envelope-check me-2"></i> 
-                    Confirmation email sent to <strong>${customer.email}</strong>
+        <div class="container py-5">
+            <div class="card shadow-lg border-0 mx-auto" style="border-radius: 20px; max-width: 600px;">
+                <div class="card-header bg-success text-white text-center py-4" style="border-radius: 20px 20px 0 0;">
+                    <div class="display-4 mb-2">🎉</div>
+                    <h2 class="mb-0 fw-bold">Order Placed Successfully!</h2>
                 </div>
-
-                ${whatsappBtnHtml}
                 
-                <div class="my-4 p-3 bg-light rounded text-start">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Payment ID:</span>
-                        <code class="fw-bold text-dark">${customer.paymentId.substring(0, 12)}...</code>
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <p class="lead">Relax! Your meal will be ready.</p>
+                        <div class="alert alert-light border-success">
+                            <h5 class="alert-heading fw-bold mb-0">Order ID</h5>
+                            <code class="fs-5 text-dark">${customer.paymentId}</code>
+                        </div>
+                        <div class="badge bg-warning text-dark fs-5 p-3 mb-3 w-100">${timingMsg}</div>
                     </div>
-                </div>
 
-                <div class="d-flex flex-column gap-2 align-items-center mt-2">
-                    <a href="index.html" class="btn btn-link text-muted" style="text-decoration: none;">Back to Home</a>
+                    <h5 class="border-bottom pb-2 mb-3">Your Order:</h5>
+                    <ul class="list-group mb-4">
+                        ${itemsSummary}
+                    </ul>
+
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="bi bi-envelope-check-fill fs-3 me-3"></i>
+                        <div>
+                            <strong>Invoice Sent!</strong><br>
+                            Check your email: <u>${customer.email}</u>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-5">
+                        <p class="text-muted mb-2">Have questions?</p>
+                        <a href="${supportLink}" target="_blank" class="btn btn-outline-success d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-whatsapp"></i> Chat with us on WhatsApp
+                        </a>
+                        <div class="mt-3">
+                            <a href="index.html" class="btn btn-link text-muted">Back to Home</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
