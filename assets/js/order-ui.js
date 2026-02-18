@@ -765,22 +765,32 @@ function generateInvoicePDF(customer, items) {
 }
 
 async function sendOrderEmail(customer, items) {
-    // Force verify emailjs presence, warn if missing
+    // 1. DEDUPLICATION CHECK
+    if (sentOrderIds.has(customer.paymentId)) {
+        console.warn(`Duplicate notification blocked for ID: ${customer.paymentId}`);
+        return;
+    }
+    sentOrderIds.add(customer.paymentId);
+
+    // Force verify emailjs presence
     if (typeof emailjs === 'undefined') {
         console.error("EmailJS not loaded! Order email skipped.");
-        alert("Warning: Email service unavailable. Please check your network or contact us.");
         return;
     }
 
-    const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0); // Recalculate cleanly
+    const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     const fee = Math.round(subtotal * ONLINE_FEE_RATE * 100) / 100;
     const total = subtotal + deliveryCost + fee;
     const itemsList = items.map(i => `${i.day}: ${i.name} x${i.quantity}`).join('\n');
 
-    // Trigger Telegram Notification
-    sendTelegramNotification(customer, items, customer.paymentId);
+    // 2. TRIGGER TELEGRAM (Single Call)
+    try {
+        await sendTelegramNotification(customer, items, customer.paymentId);
+    } catch (e) {
+        console.error("Telegram trigger failed", e);
+    }
 
-    // Consolidated message body to ensure all details are visible even if template variables are missing
+    // 3. PREPARE EMAIL CONTENT
     const message = `🚨 URGENT: NEW ORDER RECEIVED 🚨\n\n` +
         `Payment ID: ${customer.paymentId}\n\n` +
         `CUSTOMER DETAILS:\n` +
@@ -791,57 +801,46 @@ async function sendOrderEmail(customer, items) {
         `ORDER ITEMS:\n${itemsList}\n\n` +
         `Subtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
 
-    // Define the base parameters mapping to the EmailJS template variables
-    // Template likely expects: {{name}}, {{email}}, {{phone}}, {{message}}
+    // Define standard params
     const baseParams = {
         name: customer.name,
-        email: customer.email,
+        email: customer.email, // Some templates use {{email}} for body
         phone: customer.phone,
-        message: message, // The rich text constructed above
-        address: customer.address, // Extra field if template uses it
-        subject: `NEW ORDER: ${customer.paymentId}`, // Try to override subject
-        email_subject: `NEW ORDER: ${customer.paymentId}` // Alternate variable name
+        message: message,      // The rich text body
+        address: customer.address,
+        subject: `NEW ORDER: ${customer.paymentId}`,
+        email_subject: `NEW ORDER: ${customer.paymentId}`
     };
 
-    // 1. Send to Owner & SMS Gateway
+    // 4. SEND OWNER EMAIL (Simple)
     const ownerParams = {
         ...baseParams,
         to_name: "Shreeji Admin",
         reply_to: customer.email,
-        cc: ""
+        cc: "" // No CC, just direct to owner (default)
     };
 
-    // 2. Send to Customer
-    // Trying 'to_email' and 'recipient' to hit common template variable names for destination.
+    // 5. SEND CUSTOMER EMAIL (Shotgun)
     const customerParams = {
         ...baseParams,
         to_name: customer.name,
         reply_to: "info@shreejifood.co.uk",
-        to_email: customer.email, // Common variable for To field
-        recipient: customer.email, // Another common one
-        cc: customer.email // Keep CC just in case it works
+        to_email: customer.email,
+        recipient: customer.email,
+        // Removed CC here to avoid potential bounce/limit issues
     };
 
-    console.log("Sending dual emails...");
+    console.log("Sending Owner Email...");
+    emailjs.send("service_ejwyzx8", "template_djqwoxj", ownerParams)
+        .then(() => console.log("Owner Email Sent"))
+        .catch(e => console.error("Owner Email Failed", e));
 
-    // Send Admin Email
-    const p1 = emailjs.send("service_ejwyzx8", "template_djqwoxj", ownerParams)
-        .then(() => console.log("Admin Email Sent"))
-        .catch(e => console.error("Admin Email Failed", e));
-
-    // Send Customer Email (Only if valid)
-    let p2 = Promise.resolve();
     if (customer.email && customer.email.includes('@')) {
-        // We use the SAME template but specific params
-        // note: EmailJS free tier might limit recipient overriding.
-        // If template_djqwoxj is hardcoded to receive at info@, this won't work for customer.
-        // BUT we can try if the template uses {{email}} as the recipient.
-        p2 = emailjs.send("service_ejwyzx8", "template_djqwoxj", customerParams)
+        console.log("Sending Customer Email...");
+        emailjs.send("service_ejwyzx8", "template_djqwoxj", customerParams)
             .then(() => console.log("Customer Email Sent"))
             .catch(e => console.error("Customer Email Failed", e));
     }
-
-    return Promise.all([p1, p2]);
 }
 
 
