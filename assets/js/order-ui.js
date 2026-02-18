@@ -79,11 +79,9 @@ const TG_CHAT_ID = "8438924862";
 const sentOrderIds = new Set(); // Prevent duplicate notifications
 
 async function sendTelegramNotification(customer, items, paymentId) {
-    if (sentOrderIds.has(paymentId)) {
-        console.log("Notification already sent for:", paymentId);
-        return;
-    }
-    sentOrderIds.add(paymentId);
+    // Deduplication handled by parent (sendOrderEmail)
+    // if (sentOrderIds.has(paymentId)) return;
+    // sentOrderIds.add(paymentId);
 
     const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     const fee = Math.round(subtotal * ONLINE_FEE_RATE * 100) / 100;
