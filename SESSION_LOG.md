@@ -17,12 +17,6 @@
     -   Added a distinct "pressed" style (darker background + inset shadow) to the "Order Online" button on the order page.
     -   Updated `custom.css` and bumped cache versions (`v=9`).
 
-## User Requests
--   Narrow down address search to the validated postcode area.
--   Ensure smooth address selection experience.
--   Fix visual inconsistencies (font size jumps, logo differences) between index and order pages.
--   Highlight the current page ("Order Online") in the navbar.
-
 ## Payment & Notification Updates (2026-02-18)
 - **Fee Update**: Changed online ordering fee from 3% to 2% in `order-ui.js`, PDF generator, and HTML labels.
 - **PayPal Integration**: Verified Sandbox flow.
@@ -39,3 +33,7 @@
     - Created `assets/css/image-modal.css`.
     - Added modal markup to `order.html`.
     - Updated `order-ui.js` to handle click events and image extraction.
+
+## Order Logic Refinements (2026-02-18)
+- **Time Cutoff**: Confirmed logic implementation of 1:00 PM (13:00) cutoff for same-day orders. Updated comments to reflect this vs old 2:00 PM text.
+- **Cart Cleanup**: Implemented automatic cart validation on page load. Items belonging to days that are no longer available (past days or today after 1pm) are now automatically removed with a user notification.

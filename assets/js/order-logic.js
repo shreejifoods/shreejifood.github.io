@@ -1,8 +1,8 @@
 /**
  * Handles menu availability logic based on current day and time.
  * Rules:
- * - Orders for TODAY must be placed before 2:00 PM (14:00).
- * - After 2:00 PM, TODAY is unavailable.
+ * - Orders for TODAY must be placed before 1:00 PM (13:00).
+ * - After 1:00 PM, TODAY is unavailable.
  * - Future days (up to Friday) are available.
  * - Weekends are typically closed (handled by simply not showing them or marking closed).
  */

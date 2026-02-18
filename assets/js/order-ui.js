@@ -47,6 +47,23 @@ async function init() {
 
         deliveryZones = data.delivery_zones || [];
         populateDeliveryZones();
+
+        // --- Cart Validation Logic ---
+        // Remove items from the cart if their day is no longer available (e.g. day passed or after 1pm)
+        if (window.cart && window.cart.items.length > 0) {
+            const validDays = window.MenuLogic.getAvailableOrderDays();
+            const originalCount = window.cart.items.length;
+
+            // Filter out items whose day is not in the currently available days
+            window.cart.items = window.cart.items.filter(item => validDays.includes(item.day));
+
+            if (window.cart.items.length < originalCount) {
+                window.cart.save();
+                // We'll show a toast after UI is ready, or rely on updateCartUI to reflect changes
+                setTimeout(() => showToast("Note: Expired items were removed from your cart."), 1000);
+            }
+        }
+
         renderMenu(data.menu);
         updateCartUI();
 
