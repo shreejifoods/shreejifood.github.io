@@ -1143,3 +1143,54 @@ document.addEventListener('keydown', (e) => {
 
 init();
 
+// --- TEST MODE: SIMULATE PAYMENT ---
+if (window.location.search.includes('v=pay_test')) {
+    console.warn("TEST MODE ACTIVATED: 'Simulate Payment' button enabled.");
+
+    // Create the button
+    const testBtn = document.createElement('button');
+    testBtn.innerText = "🛠️ TEST: Simulate Payment (No Charge)";
+    testBtn.className = "btn btn-warning w-100 mt-3 fw-bold";
+    testBtn.style.border = "2px dashed #000";
+    testBtn.id = "simulate-pay-btn";
+
+    testBtn.onclick = async () => {
+        const name = document.getElementById('cust-name').value;
+        const email = document.getElementById('cust-email').value;
+        const phone = document.getElementById('cust-phone').value;
+
+        if (!name || !email || !phone) {
+            alert("Please fill name/email/phone first.");
+            return;
+        }
+
+        testBtn.innerText = "Processing Test...";
+        testBtn.disabled = true;
+
+        const customer = {
+            name: name,
+            email: email,
+            phone: phone,
+            address: document.getElementById('cust-address').value || 'Test Address',
+            paymentId: 'TEST-' + Date.now(),
+            type: currentOrderType
+        };
+
+        try {
+            await sendOrderEmail(customer, window.cart.items);
+            showOrderSuccess(customer, window.cart.items);
+        } catch (e) {
+            alert("Test Failed: " + e.message);
+            testBtn.disabled = false;
+        }
+    };
+
+    // Inject it into the checkout area once meaningful
+    setInterval(() => {
+        const payContainer = document.getElementById('paypal-button-container');
+        if (payContainer && !document.getElementById('simulate-pay-btn')) {
+            payContainer.parentNode.insertBefore(testBtn, payContainer);
+        }
+    }, 1000);
+}
+
