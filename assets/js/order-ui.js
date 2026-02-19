@@ -799,100 +799,138 @@ async function sendOrderEmail(customer, items) {
         `ORDER ITEMS:\n${itemsList}\n\n` +
         `Subtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
 
-    // Generate HTML Receipt Body for "Fancy" Customer Emails
+    // Generate HTML Receipt Body for "Fancy" Customer Emails (Table-Based for Email Clients)
     const isDelivery = deliveryCost > 0;
     const fulfillmentText = isDelivery ? "Expected Delivery: 7:00 PM - 8:30 PM" : "Pickup Time: 5:30 PM - 7:30 PM";
+    const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
 
     const receiptHtml = `
-        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                
-                <!-- HEADER -->
-                <div style="background-color: #2c6e49; padding: 30px 20px; text-align: center;">
-                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 1px;">SHREEJI FOOD</h1>
-                    <p style="color: #e8f5e9; margin: 5px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Authentic Homemade Taste</p>
-                </div>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4; padding: 20px 0;">
+            <tr>
+                <td align="center">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                        
+                        <!-- HEADER -->
+                        <tr>
+                            <td bgcolor="#2c6e49" align="center" style="padding: 40px 20px;">
+                                <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 1px; line-height: 1.2;">SHREEJI FOOD</h1>
+                                <p style="color: #a5d6a7; margin: 8px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Authentic Homemade Taste</p>
+                            </td>
+                        </tr>
 
-                <!-- ORDER INFO -->
-                <div style="padding: 30px;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h2 style="color: #333; margin: 0 0 10px;">Thank You, ${customer.name.split(' ')[0]}!</h2>
-                        <p style="color: #666; font-size: 16px; margin: 0;">We've received your order.</p>
-                        <div style="display: inline-block; background: #fff8e1; color: #856404; padding: 8px 15px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-top: 15px; border: 1px solid #ffeeba;">
-                            Order ID: ${customer.paymentId}
-                        </div>
-                    </div>
+                        <!-- GREETING -->
+                        <tr>
+                            <td style="padding: 40px 30px 20px 30px; text-align: center;">
+                                <h2 style="color: #333333; margin: 0 0 10px; font-size: 22px;">Order Confirmed</h2>
+                                <p style="color: #666666; font-size: 16px; line-height: 1.5; margin: 0;">Hi ${customer.name.split(' ')[0]}, thank you for your order!</p>
+                                <div style="margin-top: 20px; display: inline-block; background-color: #fff8e1; color: #856404; padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: 600; border: 1px solid #ffeeba;">
+                                    Order #${customer.paymentId}
+                                </div>
+                                <p style="color: #999; font-size: 13px; margin-top: 10px;">${dateStr}</p>
+                            </td>
+                        </tr>
 
-                    <!-- ITEMS TABLE -->
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #eee;">
-                                <th style="text-align: left; padding: 10px; color: #666; font-size: 12px; text-transform: uppercase;">Item</th>
-                                <th style="text-align: right; padding: 10px; color: #666; font-size: 12px; text-transform: uppercase;">Qty</th>
-                                <th style="text-align: right; padding: 10px; color: #666; font-size: 12px; text-transform: uppercase;">Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${items.map(i => `
-                                <tr style="border-bottom: 1px solid #f9f9f9;">
-                                    <td style="padding: 12px 10px;">
-                                        <div style="font-weight: 600; color: #333;">${i.name}</div>
-                                        <div style="font-size: 12px; color: #888;">${i.day}</div>
-                                    </td>
-                                    <td style="text-align: right; padding: 12px 10px; color: #555;">${i.quantity}</td>
-                                    <td style="text-align: right; padding: 12px 10px; color: #333;">£${(i.price * i.quantity).toFixed(2)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
+                        <!-- ITEMS TITLE -->
+                        <tr>
+                            <td style="padding: 0 30px;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="border-bottom: 2px solid #eeeeee; padding-bottom: 10px;">
+                                            <strong style="color: #2c6e49; font-size: 14px; text-transform: uppercase;">Order Details</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- ITEMS LIST -->
+                        <tr>
+                            <td style="padding: 0 30px;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    ${items.map(i => `
+                                    <tr>
+                                        <td style="padding: 15px 0; border-bottom: 1px solid #f5f5f5; vertical-align: top;">
+                                            <div style="font-size: 16px; font-weight: 600; color: #333;">${i.name}</div>
+                                            <div style="font-size: 13px; color: #888; margin-top: 4px;">${i.day}</div>
+                                        </td>
+                                        <td style="padding: 15px 0; border-bottom: 1px solid #f5f5f5; text-align: right; vertical-align: top; white-space: nowrap;">
+                                            <div style="font-size: 16px; font-weight: 600; color: #333;">£${(i.price * i.quantity).toFixed(2)}</div>
+                                            <div style="font-size: 13px; color: #888; margin-top: 4px;">Qty: ${i.quantity}</div>
+                                        </td>
+                                    </tr>
+                                    `).join('')}
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- TOTALS -->
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #fafafa;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td style="padding: 5px 0; color: #666; font-size: 15px;">Subtotal</td>
+                                        <td style="text-align: right; color: #333; font-size: 15px;">£${subtotal.toFixed(2)}</td>
+                                    </tr>
+                                    ${isDelivery ? `
+                                    <tr>
+                                        <td style="padding: 5px 0; color: #666; font-size: 15px;">Delivery</td>
+                                        <td style="text-align: right; color: #333; font-size: 15px;">£${deliveryCost.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                    <tr>
+                                        <td style="padding: 5px 0; color: #666; font-size: 15px;">Service Fee</td>
+                                        <td style="text-align: right; color: #333; font-size: 15px;">£${fee.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 15px 0 0 0; border-top: 1px solid #ddd; color: #2c6e49; font-size: 20px; font-weight: 700;">Total Paid</td>
+                                        <td style="padding: 15px 0 0 0; border-top: 1px solid #ddd; text-align: right; color: #2c6e49; font-size: 20px; font-weight: 700;">£${total.toFixed(2)}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- FULFILLMENT BOX -->
+                        <tr>
+                            <td style="padding: 30px;">
+                                <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #c8e6c9;">
+                                    <p style="color: #1b5e20; margin: 0; font-size: 16px; font-weight: 600;">${fulfillmentText}</p>
+                                    <p style="color: #4caf50; margin: 5px 0 0; font-size: 13px;">Please be ready at the address below.</p>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- ADDRESS -->
+                        <tr>
+                            <td style="padding: 0 30px 40px 30px; text-align: center;">
+                                <h3 style="font-size: 14px; text-transform: uppercase; color: #999; letter-spacing: 1px; margin-bottom: 10px;">Delivery Details</h3>
+                                <p style="color: #333; font-size: 16px; line-height: 1.5; margin: 0;"><strong>${customer.name}</strong></p>
+                                <p style="color: #555; font-size: 15px; line-height: 1.5; margin: 5px 0;">${customer.address}</p>
+                                <p style="color: #555; font-size: 15px; margin: 5px 0;">${customer.phone}</p>
+                            </td>
+                        </tr>
+
+                        <!-- FOOTER -->
+                        <tr>
+                            <td style="background-color: #333333; padding: 30px; text-align: center;">
+                                <p style="color: #ffffff; font-size: 14px; margin: 0 0 10px 0;">Thank you for supporting our small business!</p>
+                                <p style="color: #888888; font-size: 12px; margin: 0;">
+                                    &copy; ${new Date().getFullYear()} Shreeji Food & Snacks<br>
+                                    Hatfield, United Kingdom
+                                </p>
+                            </td>
+                        </tr>
                     </table>
-
-                    <!-- TOTALS -->
-                    <div style="border-top: 2px solid #eee; padding-top: 20px;">
-                        <table style="width: 100%;">
-                            <tr>
-                                <td style="padding: 5px 0; color: #666;">Subtotal</td>
-                                <td style="text-align: right; color: #333;">£${subtotal.toFixed(2)}</td>
-                            </tr>
-                            ${isDelivery ? `
-                            <tr>
-                                <td style="padding: 5px 0; color: #666;">Delivery</td>
-                                <td style="text-align: right; color: #333;">£${deliveryCost.toFixed(2)}</td>
-                            </tr>` : ''}
-                            <tr>
-                                <td style="padding: 5px 0; color: #666;">Service Fee</td>
-                                <td style="text-align: right; color: #333;">£${fee.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 15px 0; font-size: 18px; font-weight: 700; color: #2c6e49;">Total (Paid)</td>
-                                <td style="text-align: right; font-size: 18px; font-weight: 700; color: #2c6e49;">£${total.toFixed(2)}</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- FULFILLMENT -->
-                    <div style="background-color: #e8f5e9; padding: 15px; border-radius: 6px; text-align: center; margin-top: 30px; color: #2e7d32;">
-                        <strong>${fulfillmentText}</strong>
-                    </div>
-
-                    <!-- ADDRESS -->
-                    <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
-                        <p style="margin: 0 0 5px;"><strong>Customer Details</strong></p>
-                        <p style="margin: 0;">${customer.address}</p>
-                        <p style="margin: 0;">${customer.phone}</p>
-                    </div>
-
-                    <div style="text-align: center; margin-top: 40px;">
-                        <a href="https://shreejifood.github.io/" style="background-color: #d4af37; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 14px;">Order Again</a>
-                    </div>
-                </div>
-
-                <!-- FOOTER -->
-                <div style="background-color: #eee; padding: 20px; text-align: center; font-size: 12px; color: #888;">
-                    <p style="margin: 0;">&copy; ${new Date().getFullYear()} Shreeji Food & Snacks. All rights reserved.</p>
-                    <p style="margin: 5px 0 0;">Hatfield, UK • <a href="mailto:info@shreejifood.co.uk" style="color: #666; text-decoration: underline;">Contact Us</a></p>
-                </div>
-            </div>
-        </div>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
     `;
 
     // Define standard params
