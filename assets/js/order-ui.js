@@ -799,15 +799,48 @@ async function sendOrderEmail(customer, items) {
         `ORDER ITEMS:\n${itemsList}\n\n` +
         `Subtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
 
+    // Generate HTML Receipt Body for "Fancy" Customer Emails
+    const receiptHtml = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: #2c3e50;">Order Confirmation</h2>
+            <p>Thank you for your order, <strong>${customer.name}</strong>!</p>
+            <p><strong>Payment ID:</strong> ${customer.paymentId}</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <h3>Order Details:</h3>
+            <ul style="list-style: none; padding: 0;">
+                ${items.map(i => `
+                    <li style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                        <strong>${i.day}</strong>: ${i.name} <br>
+                        <span style="color: #666;">Qty: ${i.quantity} x £${i.price.toFixed(2)}</span>
+                    </li>
+                `).join('')}
+            </ul>
+            <div style="margin-top: 20px; text-align: right;">
+                <p>Subtotal: £${subtotal.toFixed(2)}</p>
+                <p>Delivery: £${deliveryCost.toFixed(2)}</p>
+                <p>Service Fee: £${fee.toFixed(2)}</p>
+                <h3 style="color: #27ae60;">Total: £${total.toFixed(2)}</h3>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="font-size: 0.9em; color: #777;">
+                <strong>Delivery Address:</strong><br>
+                ${customer.address}<br>
+                ${customer.phone}
+            </p>
+        </div>
+    `;
+
     // Define standard params
     const baseParams = {
         name: customer.name,
-        email: customer.email, // Some templates use {{email}} for body
+        email: customer.email,
         phone: customer.phone,
-        message: message,      // The rich text body
+        message: message,      // Plain text for Admin
+        receipt_body: receiptHtml, // HTML for Customer (Use {{{receipt_body}}})
         address: customer.address,
         subject: `NEW ORDER: ${customer.paymentId}`,
-        email_subject: `NEW ORDER: ${customer.paymentId}`
+        email_subject: `NEW ORDER: ${customer.paymentId}`,
+        total_str: `£${total.toFixed(2)}`
     };
 
     // 4. SEND OWNER EMAIL (Simple)
