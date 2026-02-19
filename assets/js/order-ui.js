@@ -813,18 +813,11 @@ async function sendOrderEmail(customer, items) {
     const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
 
     const receiptHtml = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f4f4;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4; padding: 20px 0;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4; padding: 20px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
             <tr>
                 <td align="center">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                        
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+
                         <!-- HEADER -->
                         <tr>
                             <td bgcolor="#2c6e49" align="center" style="padding: 40px 20px;">
@@ -922,7 +915,7 @@ async function sendOrderEmail(customer, items) {
                                 <p style="color: #555; font-size: 15px; margin: 5px 0;">${customer.phone}</p>
                             </td>
                         </tr>
-                        
+
                         <!-- WHATSAPP CTA -->
                         <tr>
                             <td style="text-align: center; padding-bottom: 20px;">
@@ -938,17 +931,15 @@ async function sendOrderEmail(customer, items) {
                                 <p style="color: #ffffff; font-size: 14px; margin: 0 0 10px 0;">Thank you for supporting our small business!</p>
                                 <p style="color: #888888; font-size: 12px; margin: 0;">
                                     &copy; ${new Date().getFullYear()} Shreeji Food & Snacks<br>
-                                    Hatfield, United Kingdom
+                                        Hatfield, United Kingdom
                                 </p>
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
-        </table>
-    </body>
-    </html>
-    `;
+        </table >
+        `;
 
     // Define standard params
     const baseParams = {
@@ -958,9 +949,9 @@ async function sendOrderEmail(customer, items) {
         message: message,      // Plain text for Admin
         receipt_body: receiptHtml, // Fancy HTML for Customer
         address: customer.address,
-        subject: `NEW ORDER: ${customer.paymentId}`,
-        email_subject: `NEW ORDER: ${customer.paymentId}`,
-        total_str: `£${total.toFixed(2)}`
+        subject: `NEW ORDER: ${customer.paymentId} `,
+        email_subject: `NEW ORDER: ${customer.paymentId} `,
+        total_str: `£${total.toFixed(2)} `
     };
 
     // 4. SEND OWNER EMAIL (Simple)
@@ -1003,10 +994,10 @@ function showToast(msg) {
     const t = document.createElement('div');
     t.className = 'toast show align-items-center border-0 shadow-lg mb-2';
     t.style.cssText = 'background: linear-gradient(135deg, #e6a800, #d49a00); color: #fff; border-radius: 12px; min-width: 280px; animation: slideDown 0.3s ease-out;';
-    t.innerHTML = `<div class="d-flex align-items-center px-3 py-2">
+    t.innerHTML = `< div class="d-flex align-items-center px-3 py-2" >
         <span style="font-size: 1.2rem; margin-right: 8px;">✅</span>
         <div class="toast-body fw-semibold" style="font-size: 0.9rem;">${msg}</div>
-    </div>`;
+    </div > `;
     box.appendChild(t);
     setTimeout(() => {
         t.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
@@ -1078,10 +1069,10 @@ function showToast(msg) {
 
         // Show loading indicator
         suggestionsEl.innerHTML = `
-            <li class="list-group-item text-center py-2" style="font-size: 0.85rem; color: #b89a40; border: none;">
-                <span class="spinner-border spinner-border-sm me-1" style="width: 14px; height: 14px; color: #e6a800;"></span>
+        < li class="list-group-item text-center py-2" style = "font-size: 0.85rem; color: #b89a40; border: none;" >
+            <span class="spinner-border spinner-border-sm me-1" style="width: 14px; height: 14px; color: #e6a800;"></span>
                 Searching addresses...
-            </li>
+            </li >
         `;
         suggestionsEl.style.display = 'block';
         addressInput.setAttribute('aria-expanded', 'true');
