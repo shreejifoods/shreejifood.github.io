@@ -800,33 +800,98 @@ async function sendOrderEmail(customer, items) {
         `Subtotal: £${subtotal.toFixed(2)}\nService Fee: £${fee.toFixed(2)}\nDelivery: £${deliveryCost.toFixed(2)}\nTotal: £${total.toFixed(2)}`;
 
     // Generate HTML Receipt Body for "Fancy" Customer Emails
+    const isDelivery = deliveryCost > 0;
+    const fulfillmentText = isDelivery ? "Expected Delivery: 7:00 PM - 8:30 PM" : "Pickup Time: 5:30 PM - 7:30 PM";
+
     const receiptHtml = `
-        <div style="font-family: sans-serif; color: #333;">
-            <h2 style="color: #2c3e50;">Order Confirmation</h2>
-            <p>Thank you for your order, <strong>${customer.name}</strong>!</p>
-            <p><strong>Payment ID:</strong> ${customer.paymentId}</p>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            <h3>Order Details:</h3>
-            <ul style="list-style: none; padding: 0;">
-                ${items.map(i => `
-                    <li style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
-                        <strong>${i.day}</strong>: ${i.name} <br>
-                        <span style="color: #666;">Qty: ${i.quantity} x £${i.price.toFixed(2)}</span>
-                    </li>
-                `).join('')}
-            </ul>
-            <div style="margin-top: 20px; text-align: right;">
-                <p>Subtotal: £${subtotal.toFixed(2)}</p>
-                <p>Delivery: £${deliveryCost.toFixed(2)}</p>
-                <p>Service Fee: £${fee.toFixed(2)}</p>
-                <h3 style="color: #27ae60;">Total: £${total.toFixed(2)}</h3>
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                
+                <!-- HEADER -->
+                <div style="background-color: #2c6e49; padding: 30px 20px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 1px;">SHREEJI FOOD</h1>
+                    <p style="color: #e8f5e9; margin: 5px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Authentic Homemade Taste</p>
+                </div>
+
+                <!-- ORDER INFO -->
+                <div style="padding: 30px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h2 style="color: #333; margin: 0 0 10px;">Thank You, ${customer.name.split(' ')[0]}!</h2>
+                        <p style="color: #666; font-size: 16px; margin: 0;">We've received your order.</p>
+                        <div style="display: inline-block; background: #fff8e1; color: #856404; padding: 8px 15px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-top: 15px; border: 1px solid #ffeeba;">
+                            Order ID: ${customer.paymentId}
+                        </div>
+                    </div>
+
+                    <!-- ITEMS TABLE -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eee;">
+                                <th style="text-align: left; padding: 10px; color: #666; font-size: 12px; text-transform: uppercase;">Item</th>
+                                <th style="text-align: right; padding: 10px; color: #666; font-size: 12px; text-transform: uppercase;">Qty</th>
+                                <th style="text-align: right; padding: 10px; color: #666; font-size: 12px; text-transform: uppercase;">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(i => `
+                                <tr style="border-bottom: 1px solid #f9f9f9;">
+                                    <td style="padding: 12px 10px;">
+                                        <div style="font-weight: 600; color: #333;">${i.name}</div>
+                                        <div style="font-size: 12px; color: #888;">${i.day}</div>
+                                    </td>
+                                    <td style="text-align: right; padding: 12px 10px; color: #555;">${i.quantity}</td>
+                                    <td style="text-align: right; padding: 12px 10px; color: #333;">£${(i.price * i.quantity).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <!-- TOTALS -->
+                    <div style="border-top: 2px solid #eee; padding-top: 20px;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="padding: 5px 0; color: #666;">Subtotal</td>
+                                <td style="text-align: right; color: #333;">£${subtotal.toFixed(2)}</td>
+                            </tr>
+                            ${isDelivery ? `
+                            <tr>
+                                <td style="padding: 5px 0; color: #666;">Delivery</td>
+                                <td style="text-align: right; color: #333;">£${deliveryCost.toFixed(2)}</td>
+                            </tr>` : ''}
+                            <tr>
+                                <td style="padding: 5px 0; color: #666;">Service Fee</td>
+                                <td style="text-align: right; color: #333;">£${fee.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 15px 0; font-size: 18px; font-weight: 700; color: #2c6e49;">Total (Paid)</td>
+                                <td style="text-align: right; font-size: 18px; font-weight: 700; color: #2c6e49;">£${total.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- FULFILLMENT -->
+                    <div style="background-color: #e8f5e9; padding: 15px; border-radius: 6px; text-align: center; margin-top: 30px; color: #2e7d32;">
+                        <strong>${fulfillmentText}</strong>
+                    </div>
+
+                    <!-- ADDRESS -->
+                    <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
+                        <p style="margin: 0 0 5px;"><strong>Customer Details</strong></p>
+                        <p style="margin: 0;">${customer.address}</p>
+                        <p style="margin: 0;">${customer.phone}</p>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 40px;">
+                        <a href="https://shreejifood.github.io/" style="background-color: #d4af37; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 14px;">Order Again</a>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div style="background-color: #eee; padding: 20px; text-align: center; font-size: 12px; color: #888;">
+                    <p style="margin: 0;">&copy; ${new Date().getFullYear()} Shreeji Food & Snacks. All rights reserved.</p>
+                    <p style="margin: 5px 0 0;">Hatfield, UK • <a href="mailto:info@shreejifood.co.uk" style="color: #666; text-decoration: underline;">Contact Us</a></p>
+                </div>
             </div>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            <p style="font-size: 0.9em; color: #777;">
-                <strong>Delivery Address:</strong><br>
-                ${customer.address}<br>
-                ${customer.phone}
-            </p>
         </div>
     `;
 
@@ -836,7 +901,7 @@ async function sendOrderEmail(customer, items) {
         email: customer.email,
         phone: customer.phone,
         message: message,      // Plain text for Admin
-        receipt_body: receiptHtml, // HTML for Customer (Use {{{receipt_body}}})
+        receipt_body: receiptHtml, // Fancy HTML for Customer
         address: customer.address,
         subject: `NEW ORDER: ${customer.paymentId}`,
         email_subject: `NEW ORDER: ${customer.paymentId}`,
