@@ -88,10 +88,13 @@ async function sendTelegramNotification(customer, items, paymentId) {
     const total = subtotal + deliveryCost + fee;
 
     // Format message for Telegram
+    // Format message for Telegram
     const itemsList = items.map(i => `• ${i.day}: ${i.name} x${i.quantity}`).join('\n');
+    const cleanPhone = customer.phone.replace(/\D/g, '').replace(/^0/, '44');
+
     const msg = `🚨 *NEW ORDER RECEIVED* 🚨\n\n` +
         `👤 *Customer*: ${customer.name}\n` +
-        `📞 *Phone*: ${customer.phone}\n` +
+        `📞 *Phone*: [${customer.phone}](https://wa.me/${cleanPhone})\n` +
         `📧 *Email*: ${customer.email}\n` +
         `📍 *Address*: ${customer.address}\n\n` +
         `🛒 *Items*:\n${itemsList}\n\n` +
@@ -789,11 +792,16 @@ async function sendOrderEmail(customer, items) {
     }
 
     // 3. PREPARE EMAIL CONTENT
+    // Phone Cleanup for WhatsApp Link
+    const cleanPhone = customer.phone.replace(/\D/g, '').replace(/^0/, '44');
+    const waLink = `https://wa.me/${cleanPhone}`;
+    const storeWaLink = "https://wa.me/447907090351"; // Store Owner Number
+
     const message = `🚨 URGENT: NEW ORDER RECEIVED 🚨\n\n` +
         `Payment ID: ${customer.paymentId}\n\n` +
         `CUSTOMER DETAILS:\n` +
         `Name: ${customer.name}\n` +
-        `Phone: ${customer.phone}\n` +
+        `Phone: ${customer.phone} ( ${waLink} )\n` +
         `Email: ${customer.email}\n` +
         `Address: ${customer.address}\n\n` +
         `ORDER ITEMS:\n${itemsList}\n\n` +
@@ -912,6 +920,15 @@ async function sendOrderEmail(customer, items) {
                                 <p style="color: #333; font-size: 16px; line-height: 1.5; margin: 0;"><strong>${customer.name}</strong></p>
                                 <p style="color: #555; font-size: 15px; line-height: 1.5; margin: 5px 0;">${customer.address}</p>
                                 <p style="color: #555; font-size: 15px; margin: 5px 0;">${customer.phone}</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- WHATSAPP CTA -->
+                        <tr>
+                            <td style="text-align: center; padding-bottom: 20px;">
+                                <a href="${storeWaLink}" style="display: inline-block; background-color: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 25px; font-weight: bold; font-family: Helvetica, Arial, sans-serif;">
+                                    Chat with us on WhatsApp
+                                </a>
                             </td>
                         </tr>
 
