@@ -60,13 +60,33 @@ function getAvailableOrderDays(mockCurrentDate = new Date()) {
     return availableDays;
 }
 
+/**
+ * Checks if the menu for the current week is completely closed/expired.
+ * Rule: Friday after 2:00 PM (14:00) until Sunday night.
+ * @param {Date} [mockCurrentDate]
+ * @returns {boolean}
+ */
+function isWeeklyMenuClosed(mockCurrentDate = new Date()) {
+    const dayIndex = mockCurrentDate.getDay(); // 0-6
+    const hour = mockCurrentDate.getHours();
+
+    // Friday (5) after 2pm (14)
+    if (dayIndex === 5 && hour >= 14) return true;
+
+    // Saturday (6) or Sunday (0)
+    if (dayIndex === 6 || dayIndex === 0) return true;
+
+    return false;
+}
+
 // Export for Node.js testing environment, or global for browser
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { isDayAvailable, getAvailableOrderDays, ORDER_CUTOFF_HOUR };
+    module.exports = { isDayAvailable, getAvailableOrderDays, isWeeklyMenuClosed, ORDER_CUTOFF_HOUR };
 } else {
     window.MenuLogic = {
         isDayAvailable,
         getAvailableOrderDays,
+        isWeeklyMenuClosed,
         ORDER_CUTOFF_HOUR
     };
 }

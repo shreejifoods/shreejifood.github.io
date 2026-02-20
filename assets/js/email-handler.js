@@ -29,6 +29,7 @@ function sendEmail() {
         email: email,
         phone: phone,
         message: message,
+        subject: "New Inquiry from " + name,
     };
 
     // Send the email only if EmailJS is defined

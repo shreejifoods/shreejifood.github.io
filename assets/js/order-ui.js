@@ -41,6 +41,12 @@ const WHATSAPP_NOTIFY_NUMBER = '447907090351';
 
 // --- Initialization ---
 async function init() {
+    // 1. Check if menu is closed for the week FIRST
+    if (window.MenuLogic && window.MenuLogic.isWeeklyMenuClosed()) {
+        renderMenu({}); // This will trigger the "Menu Closed" UI regardless of fetch
+        return;
+    }
+
     try {
         const response = await fetch('assets/data/menu.json');
         const data = await response.json();
@@ -69,7 +75,12 @@ async function init() {
 
     } catch (e) {
         console.error("Failed to init", e);
-        if (menuContainer) menuContainer.innerHTML = `<div class="alert alert-danger">Error loading menu. Please try refreshing.</div>`;
+        // Even if fetch fails, if it's the weekend, we should show the closed UI
+        if (window.MenuLogic.isWeeklyMenuClosed()) {
+            renderMenu({});
+        } else if (menuContainer) {
+            menuContainer.innerHTML = `<div class="alert alert-danger">Error loading menu. Please try refreshing.</div>`;
+        }
     }
 }
 
@@ -92,13 +103,19 @@ async function sendTelegramNotification(customer, items, paymentId) {
     const itemsList = items.map(i => `• ${i.day}: ${i.name} x${i.quantity}`).join('\n');
     const cleanPhone = customer.phone.replace(/\D/g, '').replace(/^0/, '44');
 
+    // Auto-filled message for the admin to send to customer
+    const orderSummary = items.map(i => `${i.quantity}x ${i.name}`).join(', ');
+    const waText = encodeURIComponent(`Hi ${customer.name.split(' ')[0]}, thanks for your order #${paymentId}. We've received it!`);
+    const waLink = `https://wa.me/${cleanPhone}?text=${waText}`;
+
     const msg = `🚨 *NEW ORDER RECEIVED* 🚨\n\n` +
         `👤 *Customer*: ${customer.name}\n` +
-        `📞 *Phone*: [${customer.phone}](https://wa.me/${cleanPhone})\n` +
+        `📞 *Phone*: ${customer.phone}\n` +
+        `💬 *Chat*: [Click to Open WhatsApp](${waLink})\n` + // New prominent link
         `📧 *Email*: ${customer.email}\n` +
         `📍 *Address*: ${customer.address}\n\n` +
         `🛒 *Items*:\n${itemsList}\n\n` +
-        `💰 *Total Paid*: £${total.toFixed(2)}\n` +
+        `💰 *Total Paid*: £${(subtotal + deliveryCost + fee).toFixed(2)}\n` +
         `🆔 *Pay ID*: \`${paymentId}\``;
 
     const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
@@ -228,19 +245,109 @@ function setPostcodeError(msg) {
 function renderMenu(menuData) {
     if (!menuContainer) return;
 
+    const mainCol = document.getElementById('main-order-column');
+    const cartCol = document.getElementById('cart-column');
+    const orderingTitle = document.querySelector('#ordering-section h4');
+
+    if (window.MenuLogic.isWeeklyMenuClosed()) {
+        // Layout: Ensure 8/4 grid is handled correctly
+        if (mainCol) {
+            mainCol.classList.remove('col-lg-12');
+            mainCol.classList.add('col-lg-8');
+        }
+        if (cartCol) cartCol.style.display = 'block';
+        if (orderingTitle) orderingTitle.style.display = 'none';
+
+        menuContainer.innerHTML = `
+            <div class="col-12 py-2">
+                <div class="card border-0 shadow-lg" 
+                     style="border-radius: 24px; background: #fff; overflow: hidden; border-left: 10px solid #e6a800;">
+                    <div class="row g-0">
+                        <!-- Left Panel: The Message -->
+                        <div class="col-12 col-xl-7 d-flex flex-column justify-content-center p-4 p-sm-5" 
+                             style="background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 100%); border-right: 1px solid #f0f0f0;">
+                            <div class="mb-4 d-inline-block p-3 rounded-circle" style="background: rgba(230, 168, 0, 0.1); width: fit-content;">
+                                <span style="font-size: 2.22rem;">🏠</span>
+                            </div>
+                            <h2 class="fw-bold mb-3" style="font-family: 'Source Serif 4', serif; color: #3d2e00; font-size: calc(1.8rem + 0.5vw); line-height: 1.2;">
+                                Menu Closed for the Week
+                            </h2>
+                            <p class="text-muted mb-4" style="font-size: 1.15rem; line-height: 1.6;">
+                                Our weekly menu is currently unavailable. We are busy preparing fresh, delicious homemade vegetarian meals for the upcoming week!
+                            </p>
+                            <div class="p-4 mb-5 rounded-4 shadow-sm" style="background: #fffdf5; border: 1px solid #ffd54f; position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; padding: 10px; opacity: 0.1; font-size: 3rem;">✨</div>
+                                <p class="mb-0 fw-bold" style="color: #856404; font-size: 1.3rem;">
+                                    Please check again on Monday morning!
+                                </p>
+                            </div>
+                            <div class="d-flex flex-column flex-sm-row gap-3">
+                                <a href="index.html" class="btn btn-outline-warning px-4 py-3 fw-bold" 
+                                   style="border-radius: 14px; border-width: 2.5px; transition: all 0.3s; min-width: 180px;">
+                                    Back to Home
+                                </a>
+                                <a href="https://chat.whatsapp.com/IpVA5Fwl1Eo1Z1oL5Ieq7c" target="_blank" 
+                                   class="btn btn-primary px-4 py-3 fw-bold border-0" 
+                                   style="border-radius: 14px; background: #e6a800; min-width: 180px; box-shadow: 0 4px 15px rgba(230, 168, 0, 0.25);">
+                                    Join WhatsApp Group
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Fills the Gap with Highlights -->
+                        <div class="col-12 col-xl-5 p-4 p-sm-5 d-flex flex-column justify-content-center" style="background: #fff;">
+                            <h5 class="fw-bold mb-4" style="font-family: 'Source Serif 4', serif; color: #3d2e00;">Why Order With Us?</h5>
+                            
+                            <div class="d-flex align-items-start gap-4 mb-4">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                                     style="width: 55px; height: 55px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.6rem;">🍳</div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Homemade Quality</h6>
+                                    <p class="small text-muted mb-0">Authentic recipes passed down through generations, cooked fresh daily.</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start gap-4 mb-4">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                                     style="width: 55px; height: 55px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.6rem;">🥦</div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Pure Vegetarian</h6>
+                                    <p class="small text-muted mb-0">100% vegetarian kitchen with strict hygiene and quality standards.</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start gap-4">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                                     style="width: 55px; height: 55px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.6rem;">🚚</div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Fast Local Delivery</h6>
+                                    <p class="small text-muted mb-0">Serving Hatfield, St Albans, and surrounding AL areas with a smile.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Normal Layout Logic
+    if (mainCol) {
+        mainCol.classList.remove('col-lg-12');
+        mainCol.classList.add('col-lg-8');
+    }
+    if (cartCol) cartCol.style.display = 'block';
+    if (orderingTitle) orderingTitle.style.display = 'block';
+
     const availableDays = window.MenuLogic.getAvailableOrderDays(new Date());
     const dayOrder = { 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5 };
     availableDays.sort((a, b) => dayOrder[a] - dayOrder[b]);
 
-    // Cards are inside a col-lg-8 parent, so col-lg-6 here = 50% of 66% = ~33% of page
-    // This gives each card ~380-400px on a 1400px screen, which is a good card width
     let colClass = 'col-12 col-md-6';
-    if (availableDays.length <= 2) {
-        colClass = 'col-12';
-    }
+    if (availableDays.length <= 2) colClass = 'col-12';
 
     let html = '';
-
     availableDays.forEach(day => {
         const dayMenu = menuData[day];
         if (!dayMenu || !dayMenu.active) return;
@@ -250,16 +357,10 @@ function renderMenu(menuData) {
             <div class="${colClass}">
                 <div class="card w-100 shadow-sm border-0 meal-card h-100" style="transition: transform 0.2s;">
                     <div class="card-body d-flex align-items-start gap-3 p-3">
-                        <div class="day-meal-image ${day.toLowerCase()}-img" 
-                             onclick="openMealImage(this, '${day}')" 
-                             title="Click to zoom image"
-                             role="button"
-                             aria-label="View larger image for ${day}"></div>
+                        <div class="day-meal-image ${day.toLowerCase()}-img" onclick="openMealImage(this, '${day}')" title="Click to zoom image" role="button"></div>
                         <div class="flex-grow-1 d-flex flex-column" style="min-height: 100%;">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="card-title fw-bold mb-0" style="font-family: 'Source Serif 4', serif; color: #3d2e00;">
-                                    ${day}
-                                </h6>
+                                <h6 class="card-title fw-bold mb-0" style="font-family: 'Source Serif 4', serif; color: #3d2e00;">${day}</h6>
                                 <span class="badge rounded-pill fw-semibold px-2 py-1" style="font-size: 0.8rem; background: #e6a800; color: #fff;">£${mainItem.price.toFixed(2)}</span>
                             </div>
                             <div class="meal-item-interactive mb-2" style="font-size: 0.85rem; color: #5a4a2a;">
@@ -269,9 +370,7 @@ function renderMenu(menuData) {
                             </div>
                             <button class="btn btn-sm mt-auto w-100 d-flex align-items-center justify-content-center py-2" 
                                 style="background: #e6a800; color: #fff; border: none; border-radius: 8px; font-weight: 600;"
-                                onmouseover="this.style.background='#d49a00'" onmouseout="this.style.background='#e6a800'"
-                                onclick="addItemToCart('${mainItem.id}', '${mainItem.name}', ${mainItem.price}, '${day}')"
-                                aria-label="Add ${day}'s meal (${mainItem.name}) to order">
+                                onclick="addItemToCart('${mainItem.id}', '${mainItem.name}', ${mainItem.price}, '${day}')">
                                 + Add to Order
                             </button>
                         </div>
@@ -282,14 +381,7 @@ function renderMenu(menuData) {
     });
 
     if (availableDays.length === 0) {
-        html = `
-            <div class="col-12 text-center py-5">
-                <div class="alert alert-info d-inline-block">
-                    <h4>Ordering Closed</h4>
-                    <p class="mb-0">Ordering for this week is closed. Please check back Monday!</p>
-                </div>
-            </div>
-        `;
+        html = `<div class="col-12 text-center py-5"><div class="alert alert-info border-0 shadow-sm">Ordering is closed. Please check on Monday!</div></div>`;
     }
 
     menuContainer.innerHTML = html;
@@ -791,17 +883,23 @@ async function sendOrderEmail(customer, items) {
         console.error("Telegram trigger failed", e);
     }
 
-    // 3. PREPARE EMAIL CONTENT
+    // 3. PREPARE EMAIL CONTENT & WHATSAPP LINK
     // Phone Cleanup for WhatsApp Link
     const cleanPhone = customer.phone.replace(/\D/g, '').replace(/^0/, '44');
-    const waLink = `https://wa.me/${cleanPhone}`;
+
+    // Generate Pre-filled WhatsApp Message for Admin -> Customer
+    const orderSummary = items.map(i => `${i.quantity}x ${i.name}`).join(', ');
+    const waText = encodeURIComponent(`Hi ${customer.name.split(' ')[0]}, thanks for your order #${customer.paymentId} (${orderSummary}). We have received it and will start preparing shortly!`);
+    const waLink = `https://wa.me/${cleanPhone}?text=${waText}`;
+
     const storeWaLink = "https://wa.me/447907090351"; // Store Owner Number
 
     const message = `🚨 URGENT: NEW ORDER RECEIVED 🚨\n\n` +
         `Payment ID: ${customer.paymentId}\n\n` +
         `CUSTOMER DETAILS:\n` +
         `Name: ${customer.name}\n` +
-        `Phone: ${customer.phone} ( ${waLink} )\n` +
+        `Phone: ${customer.phone}\n` +
+        `👉 CLICK TO CHAT: ${waLink}\n\n` + // More prominent link
         `Email: ${customer.email}\n` +
         `Address: ${customer.address}\n\n` +
         `ORDER ITEMS:\n${itemsList}\n\n` +
@@ -812,134 +910,156 @@ async function sendOrderEmail(customer, items) {
     const fulfillmentText = isDelivery ? "Expected Delivery: 7:00 PM - 8:30 PM" : "Pickup Time: 5:30 PM - 7:30 PM";
     const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
 
+    // ROBUST EMAIL TEMPLATE (Fixes Android Gmail & Adds Logo)
     const receiptHtml = `
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4; padding: 20px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-            <tr>
-                <td align="center">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Receipt</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f4; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+    <center>
+        <div style="background-color:#f4f4f4; max-width:600px; margin:auto;">
+            <!-- MAIN WRAPPER TABLE -->
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#ffffff; max-width:600px; margin:0 auto; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                
+                <!-- BRANDING HEADER with LOGO -->
+                <tr>
+                    <td align="center" style="padding: 25px 0; background-color:#2c6e49;">
+                        <!-- LOGO -->
+                        <img src="https://shreejifood.co.uk/assets/images/photo-1519162808019-7de1683fa-h_m298gq7r.jpg" width="80" height="auto" style="display:block; border-radius:50%; border:3px solid rgba(255,255,255,0.3); margin-bottom:15px;" alt="Shreeji Food Logo">
+                        <h1 style="color:#ffffff; margin:0; font-size:24px; font-weight:700; letter-spacing:1px; line-height:1.2; text-transform:uppercase;">Shreeji Food</h1>
+                        <p style="color:#a5d6a7; margin:5px 0 0; font-size:12px; text-transform:uppercase; letter-spacing:2px;">Authentic Homemade Taste</p>
+                    </td>
+                </tr>
 
-                        <!-- HEADER -->
-                        <tr>
-                            <td bgcolor="#2c6e49" align="center" style="padding: 40px 20px;">
-                                <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 1px; line-height: 1.2;">SHREEJI FOOD</h1>
-                                <p style="color: #a5d6a7; margin: 8px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Authentic Homemade Taste</p>
-                            </td>
-                        </tr>
+                <!-- ORDER CONFIRMATION BOX -->
+                <tr>
+                    <td align="center" style="padding: 30px 20px 10px 20px;">
+                        <h2 style="color:#333333; margin:0 0 10px; font-size:22px;">Order Confirmed</h2>
+                        <p style="color:#666666; font-size:16px; margin:0; line-height:1.5;">Hi ${customer.name.split(' ')[0]}, thank you for your order!</p>
+                        
+                        <!-- YELLOW ID BADGE -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-top:20px;">
+                            <tr>
+                                <td align="center" style="background-color:#fff8e1; border:1px solid #ffeeba; border-radius:50px; padding:10px 25px;">
+                                    <span style="color:#856404; font-size:16px; font-weight:bold;">Order #${customer.paymentId}</span>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="color:#999999; font-size:13px; margin:15px 0 0;">${dateStr}</p>
+                    </td>
+                </tr>
 
-                        <!-- GREETING -->
-                        <tr>
-                            <td style="padding: 40px 30px 20px 30px; text-align: center;">
-                                <h2 style="color: #333333; margin: 0 0 10px; font-size: 22px;">Order Confirmed</h2>
-                                <p style="color: #666666; font-size: 16px; line-height: 1.5; margin: 0;">Hi ${customer.name.split(' ')[0]}, thank you for your order!</p>
-                                <div style="margin-top: 20px; display: inline-block; background-color: #fff8e1; color: #856404; padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: 600; border: 1px solid #ffeeba;">
-                                    Order #${customer.paymentId}
-                                </div>
-                                <p style="color: #999; font-size: 13px; margin-top: 10px;">${dateStr}</p>
-                            </td>
-                        </tr>
+                <!-- ITEMS LIST -->
+                <tr>
+                    <td style="padding: 20px 30px;">
+                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="border-bottom:2px solid #eeeeee; padding-bottom:10px; color:#2c6e49; font-weight:bold; font-size:14px; text-transform:uppercase;">Your Selection</td>
+                            </tr>
+                            ${items.map(i => `
+                            <tr>
+                                <td style="padding:15px 0; border-bottom:1px solid #f5f5f5;">
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td style="vertical-align:top;">
+                                                <div style="font-size:16px; font-weight:600; color:#333;">${i.name}</div>
+                                                <div style="color:#666; font-size:13px; background:#f0f0f0; padding:4px 8px; border-radius:4px; display:inline-block; margin-top:4px;">${i.day}</div>
+                                            </td>
+                                            <td align="right" style="vertical-align:top; white-space:nowrap;">
+                                                <div style="font-size:16px; font-weight:600; color:#333;">£${(i.price * i.quantity).toFixed(2)}</div>
+                                                <div style="font-size:12px; color:#888; margin-top:4px;">Qty: ${i.quantity}</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            `).join('')}
+                        </table>
+                    </td>
+                </tr>
 
-                        <!-- ITEMS TITLE -->
-                        <tr>
-                            <td style="padding: 0 30px;">
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tr>
-                                        <td style="border-bottom: 2px solid #eeeeee; padding-bottom: 10px;">
-                                            <strong style="color: #2c6e49; font-size: 14px; text-transform: uppercase;">Order Details</strong>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
+                <!-- SUMMARY / TOTALS -->
+                <tr>
+                    <td style="padding: 0 30px;">
+                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#fafafa; border-radius:8px; padding:20px;">
+                            <tr>
+                                <td style="padding-bottom:8px; color:#666; font-size:15px;">Subtotal</td>
+                                <td align="right" style="padding-bottom:8px; color:#333; font-size:15px;">£${subtotal.toFixed(2)}</td>
+                            </tr>
+                            ${isDelivery ? `
+                            <tr>
+                                <td style="padding-bottom:8px; color:#666; font-size:15px;">Delivery</td>
+                                <td align="right" style="padding-bottom:8px; color:#333; font-size:15px;">£${deliveryCost.toFixed(2)}</td>
+                            </tr>` : ''}
+                            <tr>
+                                <td style="padding-bottom:8px; color:#666; font-size:15px;">Service Fee</td>
+                                <td align="right" style="padding-bottom:8px; color:#333; font-size:15px;">£${fee.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:15px; border-top:1px solid #ddd; color:#2c6e49; font-size:18px; font-weight:bold;">Total Paid</td>
+                                <td align="right" style="padding-top:15px; border-top:1px solid #ddd; color:#2c6e49; font-size:18px; font-weight:bold;">£${total.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
 
-                        <!-- ITEMS LIST -->
-                        <tr>
-                            <td style="padding: 0 30px;">
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    ${items.map(i => `
-                                    <tr>
-                                        <td style="padding: 15px 0; border-bottom: 1px solid #f5f5f5; vertical-align: top;">
-                                            <div style="font-size: 16px; font-weight: 600; color: #333;">${i.name}</div>
-                                            <div style="font-size: 13px; color: #888; margin-top: 4px;">${i.day}</div>
-                                        </td>
-                                        <td style="padding: 15px 0; border-bottom: 1px solid #f5f5f5; text-align: right; vertical-align: top; white-space: nowrap;">
-                                            <div style="font-size: 16px; font-weight: 600; color: #333;">£${(i.price * i.quantity).toFixed(2)}</div>
-                                            <div style="font-size: 13px; color: #888; margin-top: 4px;">Qty: ${i.quantity}</div>
-                                        </td>
-                                    </tr>
-                                    `).join('')}
-                                </table>
-                            </td>
-                        </tr>
+                <!-- PICKUP / DELIVERY TIME BOX -->
+                <tr>
+                    <td style="padding: 25px 30px;">
+                        <div style="background-color:#e8f5e9; border:1px solid #c8e6c9; border-radius:8px; padding:20px; text-align:center;">
+                            <p style="color:#1b5e20; margin:0; font-size:16px; font-weight:bold;">${fulfillmentText}</p>
+                            <p style="color:#4caf50; margin:5px 0 0; font-size:14px;">Please be ready at the address below.</p>
+                        </div>
+                    </td>
+                </tr>
 
-                        <!-- TOTALS -->
-                        <tr>
-                            <td style="padding: 20px 30px; background-color: #fafafa;">
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tr>
-                                        <td style="padding: 5px 0; color: #666; font-size: 15px;">Subtotal</td>
-                                        <td style="text-align: right; color: #333; font-size: 15px;">£${subtotal.toFixed(2)}</td>
-                                    </tr>
-                                    ${isDelivery ? `
-                                    <tr>
-                                        <td style="padding: 5px 0; color: #666; font-size: 15px;">Delivery</td>
-                                        <td style="text-align: right; color: #333; font-size: 15px;">£${deliveryCost.toFixed(2)}</td>
-                                    </tr>` : ''}
-                                    <tr>
-                                        <td style="padding: 5px 0; color: #666; font-size: 15px;">Service Fee</td>
-                                        <td style="text-align: right; color: #333; font-size: 15px;">£${fee.toFixed(2)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 15px 0 0 0; border-top: 1px solid #ddd; color: #2c6e49; font-size: 20px; font-weight: 700;">Total Paid</td>
-                                        <td style="padding: 15px 0 0 0; border-top: 1px solid #ddd; text-align: right; color: #2c6e49; font-size: 20px; font-weight: 700;">£${total.toFixed(2)}</td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
+                <!-- CUSTOMER DETAILS -->
+                <tr>
+                    <td align="center" style="padding: 0 30px 30px 30px;">
+                        <h3 style="font-size:12px; text-transform:uppercase; color:#999; letter-spacing:1px; margin-bottom:10px;">Delivery Details</h3>
+                        <p style="font-size:16px; font-weight:bold; color:#333; margin:0;">${customer.name}</p>
+                        <p style="font-size:15px; color:#555; margin:5px 0;">${customer.address}</p>
+                        <p style="font-size:15px; color:#555; margin:5px 0;">${customer.phone}</p>
+                    </td>
+                </tr>
 
-                        <!-- FULFILLMENT BOX -->
-                        <tr>
-                            <td style="padding: 30px;">
-                                <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #c8e6c9;">
-                                    <p style="color: #1b5e20; margin: 0; font-size: 16px; font-weight: 600;">${fulfillmentText}</p>
-                                    <p style="color: #4caf50; margin: 5px 0 0; font-size: 13px;">Please be ready at the address below.</p>
-                                </div>
-                            </td>
-                        </tr>
+                <!-- BULLETPROOF BUTTON: Chat with us -->
+                <tr>
+                    <td align="center" style="padding-bottom:40px;">
+                        <table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="center" bgcolor="#25D366" style="border-radius:50px;">
+                                    <a href="${storeWaLink}" target="_blank" style="font-size:16px; font-weight:bold; font-family:Helvetica, Arial, sans-serif; color:#ffffff; text-decoration:none; padding:15px 30px; border:1px solid #25D366; display:inline-block; border-radius:50px;">
+                                        Chat with us on WhatsApp
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
 
-                        <!-- ADDRESS -->
-                        <tr>
-                            <td style="padding: 0 30px 40px 30px; text-align: center;">
-                                <h3 style="font-size: 14px; text-transform: uppercase; color: #999; letter-spacing: 1px; margin-bottom: 10px;">Delivery Details</h3>
-                                <p style="color: #333; font-size: 16px; line-height: 1.5; margin: 0;"><strong>${customer.name}</strong></p>
-                                <p style="color: #555; font-size: 15px; line-height: 1.5; margin: 5px 0;">${customer.address}</p>
-                                <p style="color: #555; font-size: 15px; margin: 5px 0;">${customer.phone}</p>
-                            </td>
-                        </tr>
+                <!-- FOOTER -->
+                <tr>
+                    <td align="center" style="background-color:#333333; padding:30px;">
+                        <p style="color:#ffffff; font-size:14px; margin:0 0 10px 0;">Thank you for your support!</p>
+                        <p style="color:#888888; font-size:12px; margin:0;">
+                            &copy; ${new Date().getFullYear()} Shreeji Food & Snacks<br>
+                            Hatfield, United Kingdom
+                        </p>
+                    </td>
+                </tr>
 
-                        <!-- WHATSAPP CTA -->
-                        <tr>
-                            <td style="text-align: center; padding-bottom: 20px;">
-                                <a href="${storeWaLink}" style="display: inline-block; background-color: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 25px; font-weight: bold; font-family: Helvetica, Arial, sans-serif;">
-                                    Chat with us on WhatsApp
-                                </a>
-                            </td>
-                        </tr>
-
-                        <!-- FOOTER -->
-                        <tr>
-                            <td style="background-color: #333333; padding: 30px; text-align: center;">
-                                <p style="color: #ffffff; font-size: 14px; margin: 0 0 10px 0;">Thank you for supporting our small business!</p>
-                                <p style="color: #888888; font-size: 12px; margin: 0;">
-                                    &copy; ${new Date().getFullYear()} Shreeji Food & Snacks<br>
-                                        Hatfield, United Kingdom
-                                </p>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table >
-        `;
+            </table>
+            <!-- END MAIN WRAPPER -->
+        </div>
+    </center>
+</body>
+</html>
+    `;
 
     // Define standard params
     const baseParams = {
@@ -955,36 +1075,42 @@ async function sendOrderEmail(customer, items) {
     };
 
     // 4. SEND OWNER EMAIL (Simple)
+    // 4. SEND OWNER EMAIL (Admin Alert) - params use 'message'
     const ownerParams = {
         ...baseParams,
         to_name: "Shreeji Admin",
         reply_to: customer.email,
-        cc: "" // No CC, just direct to owner (default)
+        email: "info@shreejifood.co.uk", // Force 'To' address to Admin, overriding customer.email
+        recipient: "info@shreejifood.co.uk", // Redundant safety for some template configs
+        message: message // Plain text alert
     };
 
-    // 5. SEND CUSTOMER EMAIL (Shotgun)
+    // 5. SEND CUSTOMER EMAIL (HTML Receipt) - Uses 'template_6dyvbym'
     const customerParams = {
         ...baseParams,
         to_name: customer.name,
         reply_to: "info@shreejifood.co.uk",
-        to_email: customer.email,
-        recipient: customer.email,
-        // Removed CC here to avoid potential bounce/limit issues
+        email: customer.email,
+        email_subject: `Order #${customer.paymentId}`,
+        receipt_body: receiptHtml // Mapped to {{{receipt_body}}} in the template
     };
 
-    console.log("Sending Owner Email...");
-    emailjs.send("service_ejwyzx8", "template_djqwoxj", ownerParams)
-        .then(() => console.log("Owner Email Sent"))
-        .catch(e => console.error("Owner Email Failed", e));
+    // Send Owner Email
+    if (typeof emailjs !== 'undefined') {
+        console.log("Sending Owner Email...");
+        emailjs.send("service_ejwyzx8", "template_djqwoxj", ownerParams)
+            .then(() => console.log("Owner Email Sent"))
+            .catch(e => console.error("Owner Email Failed", e));
 
-    /*
-    if (customer.email && customer.email.includes('@')) {
-        console.log("Sending Customer Email (DISABLED: Fix Template First)");
-        // emailjs.send("service_ejwyzx8", "template_djqwoxj", customerParams)
-        //     .then(() => console.log("Customer Email Sent"))
-        //     .catch(e => console.error("Customer Email Failed", e));
+        // Send Customer Email (Receipt)
+        if (customer.email && customer.email.includes('@')) {
+            console.log("Sending Customer Email...");
+            // Switched to the specific RECEIPT template ID
+            emailjs.send("service_ejwyzx8", "template_6dyvbym", customerParams)
+                .then(() => console.log("Customer Email Sent"))
+                .catch(e => console.error("Customer Email Failed", e));
+        }
     }
-    */
 }
 
 
