@@ -324,7 +324,7 @@ function renderMenu(menuData) {
                                      style="width: 50px; height: 50px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.4rem;">🚚</div>
                                 <div>
                                     <h6 class="fw-bold mb-1">Fast Delivery</h6>
-                                    <p class="small text-muted mb-0">Serving Hatfield & St Albans.</p>
+                                    <p class="small text-muted mb-0">Serving Hatfield and surrounding areas.</p>
                                 </div>
                             </div>
                         </div>
