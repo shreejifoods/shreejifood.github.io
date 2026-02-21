@@ -258,11 +258,14 @@ function renderMenu(menuData) {
         if (cartCol) cartCol.style.display = 'block';
         if (orderingTitle) orderingTitle.style.display = 'none';
 
+        // CRITICAL: Disable the CSS Grid from custom.css that restricts width
+        menuContainer.style.setProperty('display', 'block', 'important');
+
         menuContainer.innerHTML = `
             <div class="col-12 py-2">
                 <div class="card border-0 shadow-lg" 
-                     style="border-radius: 24px; background: #fff; overflow: hidden; border-left: 10px solid #e6a800;">
-                    <div class="row g-0">
+                     style="border-radius: 24px; background: #fff; overflow: hidden; border-left: 10px solid #e6a800; width: 100% !important;">
+                    <div class="row g-0" style="flex-direction: row !important;">
                         <!-- Left Panel: The Message -->
                         <div class="col-12 col-xl-7 d-flex flex-column justify-content-center p-4 p-sm-5" 
                              style="background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 100%); border-right: 1px solid #f0f0f0;">
@@ -289,39 +292,39 @@ function renderMenu(menuData) {
                                 <a href="https://chat.whatsapp.com/IpVA5Fwl1Eo1Z1oL5Ieq7c" target="_blank" 
                                    class="btn btn-primary px-4 py-3 fw-bold border-0" 
                                    style="border-radius: 14px; background: #e6a800; min-width: 180px; box-shadow: 0 4px 15px rgba(230, 168, 0, 0.25);">
-                                    Join WhatsApp Group
+                                    Join Group
                                 </a>
                             </div>
                         </div>
 
-                        <!-- Right Panel: Fills the Gap with Highlights -->
+                        <!-- Right Panel: Feature Highlights -->
                         <div class="col-12 col-xl-5 p-4 p-sm-5 d-flex flex-column justify-content-center" style="background: #fff;">
                             <h5 class="fw-bold mb-4" style="font-family: 'Source Serif 4', serif; color: #3d2e00;">Why Order With Us?</h5>
                             
-                            <div class="d-flex align-items-start gap-4 mb-4">
+                            <div class="d-flex align-items-start gap-3 mb-4">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
-                                     style="width: 55px; height: 55px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.6rem;">🍳</div>
+                                     style="width: 50px; height: 50px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.4rem;">🍳</div>
                                 <div>
                                     <h6 class="fw-bold mb-1">Homemade Quality</h6>
-                                    <p class="small text-muted mb-0">Authentic recipes passed down through generations, cooked fresh daily.</p>
+                                    <p class="small text-muted mb-0">Authentic recipes, cooked fresh daily.</p>
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-start gap-4 mb-4">
+                            <div class="d-flex align-items-start gap-3 mb-4">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
-                                     style="width: 55px; height: 55px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.6rem;">🥦</div>
+                                     style="width: 50px; height: 50px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.4rem;">🥦</div>
                                 <div>
                                     <h6 class="fw-bold mb-1">Pure Vegetarian</h6>
-                                    <p class="small text-muted mb-0">100% vegetarian kitchen with strict hygiene and quality standards.</p>
+                                    <p class="small text-muted mb-0">100% pure vegetarian kitchen.</p>
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-start gap-4">
+                            <div class="d-flex align-items-start gap-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
-                                     style="width: 55px; height: 55px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.6rem;">🚚</div>
+                                     style="width: 50px; height: 50px; background: #fdfbf7; border: 1px solid #eee; flex-shrink: 0; font-size: 1.4rem;">🚚</div>
                                 <div>
-                                    <h6 class="fw-bold mb-1">Fast Local Delivery</h6>
-                                    <p class="small text-muted mb-0">Serving Hatfield, St Albans, and surrounding AL areas with a smile.</p>
+                                    <h6 class="fw-bold mb-1">Fast Delivery</h6>
+                                    <p class="small text-muted mb-0">Serving Hatfield & St Albans.</p>
                                 </div>
                             </div>
                         </div>
@@ -333,6 +336,7 @@ function renderMenu(menuData) {
     }
 
     // Normal Layout Logic
+    menuContainer.style.removeProperty('display');
     if (mainCol) {
         mainCol.classList.remove('col-lg-12');
         mainCol.classList.add('col-lg-8');
