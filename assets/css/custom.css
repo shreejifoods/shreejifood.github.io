@@ -9,6 +9,35 @@
     line-height: 1.3 !important;
 }
 
+/* --- Refined Navbar Logo Styling --- */
+/* Hide the 'SHREEJI' text within the image and focus on the house icon */
+.navbar-logo a {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 68px !important;
+    height: 68px !important;
+    overflow: hidden !important;
+    border-radius: 50%;
+    margin-right: 15px;
+    background: #fff; /* White base for clean cutout */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo a:hover {
+    transform: scale(1.05);
+}
+
+.navbar-logo img {
+    height: 185% !important; /* Zoom in to hide the bottom text */
+    width: auto !important;
+    max-width: none !important;
+    object-fit: cover;
+    object-position: center 12% !important; /* Move focus up to icons */
+    transition: all 0.3s ease;
+}
+
 /* Custom Overrides STRICTLY for Order Page */
 
 /* Apply this class to body of order.html */
